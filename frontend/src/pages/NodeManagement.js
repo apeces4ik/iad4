@@ -214,47 +214,73 @@ const NodeManagement = () => {
           <h1 data-testid="nodes-title">My Nodes</h1>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="register-node-btn" data-testid="register-node-btn">
+              <Button 
+                className="register-node-btn" 
+                data-testid="register-node-btn"
+                disabled={!isConnected || isPending || isConfirming}
+              >
                 <Plus size={18} />
                 Register Node
               </Button>
             </DialogTrigger>
             <DialogContent data-testid="register-dialog">
               <DialogHeader>
-                <DialogTitle>Register New Node</DialogTitle>
+                <DialogTitle>Register New Node on Blockchain</DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleRegisterNode} className="node-form">
-                <div className="form-field">
-                  <Label htmlFor="location">Location</Label>
-                  <Select
-                    value={formData.location}
-                    onValueChange={(value) => setFormData({ ...formData, location: value })}
+              
+              {!isConnected ? (
+                <div className="text-center py-4">
+                  <AlertCircle className="mx-auto mb-2 text-yellow-500" size={32} />
+                  <p className="text-sm text-gray-600">Please connect your wallet to register a node</p>
+                </div>
+              ) : (
+                <form onSubmit={handleRegisterNode} className="node-form">
+                  <div className="form-field">
+                    <Label htmlFor="location">Location</Label>
+                    <Select
+                      value={formData.location}
+                      onValueChange={(value) => setFormData({ ...formData, location: value })}
+                      disabled={isPending || isConfirming}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="us-east">United States (East)</SelectItem>
+                        <SelectItem value="eu-west">Europe (West)</SelectItem>
+                        <SelectItem value="asia-pacific">Asia Pacific</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="form-field">
+                    <Label htmlFor="bandwidth">Bandwidth (Mbps)</Label>
+                    <Input
+                      id="bandwidth"
+                      type="number"
+                      min="10"
+                      value={formData.bandwidth_mbps}
+                      onChange={(e) => setFormData({ ...formData, bandwidth_mbps: parseInt(e.target.value) })}
+                      data-testid="bandwidth-input"
+                      disabled={isPending || isConfirming}
+                    />
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-3">
+                    <p className="text-xs text-blue-800">
+                      ⛓️ This will register your node on the blockchain. You'll need to confirm the transaction in your wallet.
+                    </p>
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    data-testid="submit-node-btn"
+                    disabled={isPending || isConfirming}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select location" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="us-east">United States (East)</SelectItem>
-                      <SelectItem value="eu-west">Europe (West)</SelectItem>
-                      <SelectItem value="asia-pacific">Asia Pacific</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="form-field">
-                  <Label htmlFor="bandwidth">Bandwidth (Mbps)</Label>
-                  <Input
-                    id="bandwidth"
-                    type="number"
-                    min="10"
-                    value={formData.bandwidth_mbps}
-                    onChange={(e) => setFormData({ ...formData, bandwidth_mbps: parseInt(e.target.value) })}
-                    data-testid="bandwidth-input"
-                  />
-                </div>
-                <Button type="submit" className="w-full" data-testid="submit-node-btn">
-                  Register Node
-                </Button>
-              </form>
+                    {isPending ? "Waiting for wallet..." : isConfirming ? "Confirming..." : "Register Node"}
+                  </Button>
+                </form>
+              )}
             </DialogContent>
           </Dialog>
         </header>
