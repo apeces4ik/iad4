@@ -152,7 +152,7 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
         try:
             # Check if interface is already up
             result = subprocess.run(
-                ["wg", "show", self.interface],
+                ["sudo", "wg", "show", self.interface],
                 capture_output=True,
                 text=True
             )
@@ -162,7 +162,7 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
                 return
             
             # Bring up the interface
-            subprocess.run(["wg-quick", "up", self.interface], check=True)
+            subprocess.run(["sudo", "wg-quick", "up", self.interface], check=True)
             logger.info(f"WireGuard server started on {self.interface}")
             
         except subprocess.CalledProcessError as e:
@@ -172,7 +172,7 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
     def stop_server(self):
         """Stop WireGuard server"""
         try:
-            subprocess.run(["wg-quick", "down", self.interface], check=True)
+            subprocess.run(["sudo", "wg-quick", "down", self.interface], check=True)
             logger.info(f"WireGuard server stopped on {self.interface}")
         except subprocess.CalledProcessError as e:
             logger.error(f"Failed to stop WireGuard server: {e}")
