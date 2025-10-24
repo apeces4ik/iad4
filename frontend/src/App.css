@@ -1078,19 +1078,23 @@ h1, h2, h3, h4 {
 
 .vpn-globe-container {
   position: relative;
-  margin: 2rem 0;
+  margin: 3rem 0;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 200px;
 }
 
 .vpn-globe {
   color: var(--primary-cyan);
-  opacity: 0.8;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 30px rgba(6, 182, 212, 0.6));
+  transition: all 0.5s ease;
 }
 
 .vpn-globe.spinning {
   animation: rotate 20s linear infinite;
+  filter: drop-shadow(0 0 50px rgba(6, 182, 212, 0.8));
 }
 
 @keyframes rotate {
@@ -1102,18 +1106,54 @@ h1, h2, h3, h4 {
   position: absolute;
   width: 160px;
   height: 160px;
-  border: 2px solid var(--primary-cyan);
+  border: 3px solid var(--primary-cyan);
   border-radius: 50%;
   animation: pulse-ring 2s ease-out infinite;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+}
+
+.pulse-ring:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.pulse-ring:nth-child(3) {
+  animation-delay: 1s;
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(1.5); opacity: 0; }
+  0% { 
+    transform: scale(0.8); 
+    opacity: 1; 
+    border-width: 3px;
+  }
+  100% { 
+    transform: scale(1.8); 
+    opacity: 0;
+    border-width: 0px;
+  }
 }
 
-.vpn-info h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }
-.vpn-info p { color: var(--text-secondary); margin-bottom: 2rem; }
+.vpn-info {
+  position: relative;
+  z-index: 1;
+}
+
+.vpn-info h3 { 
+  font-size: 2rem; 
+  margin-bottom: 0.75rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--text-primary), var(--primary-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.vpn-info p { 
+  color: var(--text-secondary); 
+  margin-bottom: 2rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
 
 .vpn-action-btn {
   padding: 1rem 3rem;
