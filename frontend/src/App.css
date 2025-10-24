@@ -1576,6 +1576,87 @@ h1, h2, h3, h4 {
   gap: 0.5rem;
 }
 
+/* Dialog styling for Node Registration */
+[data-testid="register-dialog"] {
+  background: rgba(26, 26, 36, 0.98) !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(6, 182, 212, 0.2) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-testid="register-dialog"] * {
+  color: var(--text-primary) !important;
+}
+
+[data-testid="register-dialog"] h2,
+[data-testid="register-dialog"] .text-sm {
+  color: var(--text-primary) !important;
+}
+
+[data-testid="register-dialog"] label {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+[data-testid="register-dialog"] input,
+[data-testid="register-dialog"] button[role="combobox"] {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-primary) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.75rem 1rem !important;
+  transition: all 0.3s ease !important;
+}
+
+[data-testid="register-dialog"] input:focus,
+[data-testid="register-dialog"] button[role="combobox"]:focus {
+  outline: none !important;
+  border-color: var(--primary-cyan) !important;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-testid="register-dialog"] input::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+[data-testid="register-dialog"] .bg-blue-50 {
+  background: rgba(6, 182, 212, 0.1) !important;
+  border-color: rgba(6, 182, 212, 0.3) !important;
+}
+
+[data-testid="register-dialog"] .text-blue-800 {
+  color: var(--primary-cyan) !important;
+}
+
+[data-testid="register-dialog"] .text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+
+/* Select dropdown styling */
+[role="listbox"] {
+  background: rgba(26, 26, 36, 0.98) !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+[role="option"] {
+  color: var(--text-primary) !important;
+  padding: 0.75rem 1rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+[role="option"]:hover,
+[role="option"][data-state="checked"] {
+  background: rgba(6, 182, 212, 0.2) !important;
+  color: var(--primary-cyan) !important;
+}
+
 .staking-container {
   max-width: 1200px;
   margin: 0 auto;
