@@ -380,19 +380,15 @@ PersistentKeepalive = 25
     
     def get_server_status(self) -> Dict:
         """
-        Get WireGuard server status
+        Get WireGuard server status (MVP mode - simulated)
         
         Returns:
             Dict with server status information
         """
         try:
-            result = subprocess.run(
-                ["wg", "show", self.interface],
-                capture_output=True,
-                text=True
-            )
-            
-            is_running = result.returncode == 0
+            # Check if status file exists
+            status_file = Path("/app/backend/vpn/status/server_running")
+            is_running = status_file.exists()
             
             if is_running:
                 peers = self.list_peers()
@@ -402,14 +398,16 @@ PersistentKeepalive = 25
                     "port": self.server_port,
                     "address": self.server_address,
                     "total_peers": len(peers),
-                    "active_peers": sum(1 for p in peers if p.get('endpoint'))
+                    "active_peers": len(peers),  # In MVP, all peers are "active"
+                    "mode": "mvp_simulation"
                 }
             else:
                 return {
                     "running": False,
-                    "interface": self.interface
+                    "interface": self.interface,
+                    "mode": "mvp_simulation"
                 }
                 
         except Exception as e:
             logger.error(f"Failed to get server status: {e}")
-            return {"running": False, "error": str(e)}
+            return {"running": False, "error": str(e), "mode": "mvp_simulation"}
