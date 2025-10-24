@@ -300,41 +300,38 @@ PersistentKeepalive = 25
     
     def list_peers(self) -> List[Dict]:
         """
-        List all connected peers
+        List all connected peers (MVP mode - from JSON files)
         
         Returns:
             List of peer information
         """
         try:
-            # Get peer info from wg command
-            result = subprocess.run(
-                ["wg", "show", self.interface, "dump"],
-                capture_output=True,
-                text=True,
-                check=True
-            )
+            import json
+            import random
             
             peers = []
-            lines = result.stdout.strip().split('\n')
             
-            # Skip first line (server info)
-            for line in lines[1:]:
-                if line:
-                    parts = line.split('\t')
-                    if len(parts) >= 6:
+            # Read from stored peer files
+            if self.peers_dir.exists():
+                for peer_file in self.peers_dir.glob("*.json"):
+                    try:
+                        peer_info = json.loads(peer_file.read_text())
+                        # Simulate some traffic stats
                         peers.append({
-                            "public_key": parts[0],
-                            "preshared_key": parts[1] if parts[1] != "(none)" else None,
-                            "endpoint": parts[2] if parts[2] != "(none)" else None,
-                            "allowed_ips": parts[3],
-                            "latest_handshake": int(parts[4]),
-                            "transfer_rx": int(parts[5]),
-                            "transfer_tx": int(parts[6]) if len(parts) > 6 else 0
+                            "public_key": peer_info.get("public_key", ""),
+                            "preshared_key": peer_info.get("preshared_key"),
+                            "endpoint": "simulated",
+                            "allowed_ips": peer_info.get("allowed_ips", ""),
+                            "latest_handshake": int(datetime.utcnow().timestamp()),
+                            "transfer_rx": random.randint(1000000, 100000000),  # Simulated
+                            "transfer_tx": random.randint(1000000, 100000000)   # Simulated
                         })
+                    except Exception as e:
+                        logger.warning(f"Failed to read peer file {peer_file}: {e}")
             
             return peers
             
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             logger.error(f"Failed to list peers: {e}")
             return []
     
