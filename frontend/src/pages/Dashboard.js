@@ -133,31 +133,38 @@ const Dashboard = () => {
         </header>
 
         <div className="dashboard-content">
-          {loading ? (
+          {!walletAddress ? (
             <div className="loading-state" data-testid="loading-state">
               <div className="spinner"></div>
-              <p>Loading dashboard...</p>
+              <p>Connecting to blockchain...</p>
             </div>
           ) : (
             <>
               <div className="stats-grid">
-                <Card className="stat-card" data-testid="balance-card">
+                <Card className="stat-card blockchain-card" data-testid="balance-card">
                   <CardHeader>
                     <CardTitle>AETH Balance</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="stat-value">{stats?.aeth_balance?.toFixed(2) || "0.00"}</div>
+                    <div className="stat-value">{balance?.toFixed(2) || "0.00"}</div>
                     <div className="stat-label">$AETH</div>
+                    <div className="blockchain-badge">🔗 On-Chain</div>
                   </CardContent>
                 </Card>
 
-                <Card className="stat-card" data-testid="staked-card">
+                <Card className="stat-card blockchain-card" data-testid="staked-card">
                   <CardHeader>
                     <CardTitle>Staked AETH</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="stat-value">{stats?.staked_aeth?.toFixed(2) || "0.00"}</div>
-                    <div className="stat-label">Earning 10% APY</div>
+                    <div className="stat-value">{stakeInfo?.amount?.toFixed(2) || "0.00"}</div>
+                    <div className="stat-label">
+                      Earning 10% APY
+                      {stakeInfo?.pendingRewards > 0 && (
+                        <span className="rewards-pending"> • {stakeInfo.pendingRewards.toFixed(4)} pending</span>
+                      )}
+                    </div>
+                    <div className="blockchain-badge">🔗 On-Chain</div>
                   </CardContent>
                 </Card>
 
@@ -166,18 +173,19 @@ const Dashboard = () => {
                     <CardTitle>Total Earnings</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="stat-value">{stats?.total_earnings?.toFixed(2) || "0.00"}</div>
+                    <div className="stat-value">{nodeStats.totalEarnings?.toFixed(2) || "0.00"}</div>
                     <div className="stat-label">$AETH from nodes</div>
                   </CardContent>
                 </Card>
 
-                <Card className="stat-card" data-testid="nodes-card">
+                <Card className="stat-card blockchain-card" data-testid="nodes-card">
                   <CardHeader>
                     <CardTitle>Active Nodes</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="stat-value">{stats?.active_nodes || 0}</div>
-                    <div className="stat-label">{stats?.total_data_shared?.toFixed(2) || "0.00"} GB shared</div>
+                    <div className="stat-value">{nodeIds?.length || 0}</div>
+                    <div className="stat-label">{nodeStats.totalDataShared?.toFixed(2) || "0.00"} GB shared</div>
+                    <div className="blockchain-badge">🔗 On-Chain</div>
                   </CardContent>
                 </Card>
               </div>
