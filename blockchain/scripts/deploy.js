@@ -69,7 +69,8 @@ async function main() {
       AETHToken: aethAddress,
       MinerNode: minerNodeAddress,
       VPNSession: vpnSessionAddress,
-      Validator: validatorAddress
+      Validator: validatorAddress,
+      PremiumVPN: premiumVPNAddress
     }
   };
 
