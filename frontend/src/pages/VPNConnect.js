@@ -387,7 +387,12 @@ const VPNConnectNew = () => {
 
             {!activeSession && (
               <div className="locations-section" data-testid="locations-section">
-                <h2>Select Location</h2>
+                <h2 style={{ color: "var(--text-primary)", marginBottom: "8px" }}>Select Location</h2>
+                {isPremium && (
+                  <p style={{ color: "var(--text-secondary)", fontSize: "14px", marginBottom: "16px" }}>
+                    👑 Premium: Connected to high-performance nodes with reputation &gt; 90
+                  </p>
+                )}
                 <div className="locations-grid">
                   {locations.map((location) => (
                     <Card
@@ -395,11 +400,28 @@ const VPNConnectNew = () => {
                       onClick={() => setSelectedLocation(location.code)}
                       className={`location-card ${selectedLocation === location.code ? "selected" : ""}`}
                       data-testid={`location-${location.code}`}
+                      style={{ 
+                        cursor: "pointer",
+                        border: selectedLocation === location.code ? "2px solid var(--primary-cyan)" : "1px solid rgba(255,255,255,0.1)",
+                        transition: "all 0.3s ease"
+                      }}
                     >
-                      <div className="location-flag">{location.flag}</div>
-                      <div className="location-info">
-                        <h4>{location.name}</h4>
-                        <p>{location.nodes} node{location.nodes !== 1 ? 's' : ''} available</p>
+                      <div className="location-flag" style={{ fontSize: "32px", marginBottom: "8px" }}>{location.flag}</div>
+                      <div className="location-info" style={{ color: "var(--text-primary)" }}>
+                        <h4 style={{ margin: "0 0 8px 0", fontSize: "16px", fontWeight: "700", color: "var(--text-primary)" }}>{location.name}</h4>
+                        <div style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+                          <p style={{ margin: "4px 0" }}>
+                            🖥️ {location.total_nodes || location.nodes} nodes available
+                          </p>
+                          {location.premium_nodes && isPremium && (
+                            <p style={{ margin: "4px 0", color: "var(--primary-cyan)", fontWeight: "600" }}>
+                              👑 {location.premium_nodes} premium nodes
+                            </p>
+                          )}
+                          {location.avg_speed && (
+                            <p style={{ margin: "4px 0" }}>⚡ ~{location.avg_speed} Mbps</p>
+                          )}
+                        </div>
                       </div>
                     </Card>
                   ))}
