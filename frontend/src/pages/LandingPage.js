@@ -15,13 +15,11 @@ const LandingPage = () => {
 
   const handleGetStarted = async () => {
     if (!isConnected) {
-      // Connect wallet first
       const connector = connectors[0];
       if (connector) {
         setIsConnecting(true);
         try {
           await connect({ connector });
-          // After wallet connection, authenticate
           setTimeout(async () => {
             const success = await login();
             if (success) {
@@ -35,7 +33,6 @@ const LandingPage = () => {
         }
       }
     } else if (!isAuthenticated) {
-      // Wallet connected but not authenticated
       setIsConnecting(true);
       const success = await login();
       if (success) {
@@ -43,14 +40,12 @@ const LandingPage = () => {
       }
       setIsConnecting(false);
     } else {
-      // Already authenticated
       navigate("/dashboard");
     }
   };
 
   return (
     <div className="landing-page">
-      {/* Hero Section */}
       <div className="hero-section">
         <nav className="nav-bar">
           <div className="logo" data-testid="logo">
@@ -71,13 +66,7 @@ const LandingPage = () => {
               disabled={isConnecting}
               className="cta-button"
             >
-              {isConnecting
-                ? "Connecting..."
-                : isAuthenticated
-                ? "Go to Dashboard"
-                : isConnected
-                ? "Sign to Continue"
-                : "Connect Wallet"}
+              {isConnecting ? "Connecting..." : isAuthenticated ? "Go to Dashboard" : isConnected ? "Sign to Continue" : "Connect Wallet"}
               <ChevronRight className="ml-2" size={18} />
             </Button>
           </div>
@@ -114,7 +103,6 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* Features Section */}
       <div className="features-section" data-testid="features-section">
         <h2 className="section-title">How It Works</h2>
         <div className="features-grid">
@@ -164,7 +152,6 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* CTA Section */}
       <div className="cta-section" data-testid="cta-section">
         <div className="cta-content">
           <h2>Ready to Start Earning?</h2>
@@ -182,7 +169,6 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* Footer */}
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-logo">
