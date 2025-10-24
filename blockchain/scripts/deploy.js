@@ -119,6 +119,7 @@ async function main() {
   console.log("Miner Node:", minerNodeAddress);
   console.log("VPN Session:", vpnSessionAddress);
   console.log("Validator:", validatorAddress);
+  console.log("Premium VPN:", premiumVPNAddress);
   console.log("====================\n");
 }
 
