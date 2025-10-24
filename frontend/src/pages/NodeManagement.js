@@ -1,60 +1,86 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import axios from "axios";
+import { useAccount } from "wagmi";
+import { useMinerNode, useMinerNodeWrite, useNodeInfo } from "@/hooks/useBlockchain";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Wifi, TrendingUp, Network, Coins, LogOut, Menu, X, Plus, Server } from "lucide-react";
+import { Wifi, TrendingUp, Network, Coins, LogOut, Menu, X, Plus, Server, RefreshCw, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const NodeManagement = () => {
   const navigate = useNavigate();
-  const { user, token, logout } = useAuth();
-  const [nodes, setNodes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { user, logout } = useAuth();
+  const { address, isConnected } = useAccount();
+  
+  // Blockchain hooks
+  const { nodeIds, refetchNodes } = useMinerNode(address);
+  const { registerNode, deactivateNode, isPending, isConfirming, isConfirmed, error } = useMinerNodeWrite();
+  
   const [dialogOpen, setDialogOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [formData, setFormData] = useState({
     location: "us-east",
     bandwidth_mbps: 100,
   });
 
+  // Watch for transaction confirmation
   useEffect(() => {
-    fetchNodes();
-  }, []);
-
-  const fetchNodes = async () => {
-    try {
-      const response = await axios.get(`${API}/nodes/my-nodes`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setNodes(response.data);
-    } catch (error) {
-      toast.error("Failed to load nodes");
-    } finally {
-      setLoading(false);
+    if (isConfirmed) {
+      toast.success("Transaction confirmed!");
+      handleRefresh();
+      setFormData({ location: "us-east", bandwidth_mbps: 100 });
+      setDialogOpen(false);
     }
+  }, [isConfirmed]);
+
+  // Watch for errors
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message || "Transaction failed");
+    }
+  }, [error]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refetchNodes();
+    setRefreshing(false);
   };
 
   const handleRegisterNode = async (e) => {
     e.preventDefault();
+    
+    if (!isConnected) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+
     try {
-      await axios.post(`${API}/nodes/register`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success("Node registered successfully!");
-      setDialogOpen(false);
-      fetchNodes();
-      setFormData({ location: "us-east", bandwidth_mbps: 100 });
-    } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to register node");
+      await registerNode(formData.location, formData.bandwidth_mbps);
+      toast.info("Transaction submitted! Registering node...");
+    } catch (err) {
+      console.error("Register node error:", err);
+      toast.error(err.message || "Failed to register node");
+    }
+  };
+
+  const handleDeactivateNode = async (nodeId) => {
+    if (!isConnected) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+
+    try {
+      await deactivateNode(nodeId);
+      toast.info("Deactivating node...");
+    } catch (err) {
+      console.error("Deactivate node error:", err);
+      toast.error(err.message || "Failed to deactivate node");
     }
   };
 
