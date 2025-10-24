@@ -830,15 +830,21 @@ h1, h2, h3, h4 {
 .dashboard-main {
   flex: 1;
   margin-left: 280px;
+  position: relative;
 }
 
 .dashboard-header {
   padding: 2rem;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--bg-card);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(26, 26, 36, 0.6);
+  backdrop-filter: blur(20px);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .menu-toggle {
@@ -847,15 +853,26 @@ h1, h2, h3, h4 {
   border: none;
   color: var(--text-primary);
   cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.menu-toggle:hover {
+  transform: scale(1.1);
 }
 
 .dashboard-header h1 {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--text-primary), var(--primary-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.01em;
 }
 
 .dashboard-content {
   padding: 2rem;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .loading-state {
@@ -870,10 +887,11 @@ h1, h2, h3, h4 {
 .spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid var(--border-color);
+  border: 4px solid rgba(255, 255, 255, 0.1);
   border-top-color: var(--primary-cyan);
   border-radius: 50%;
   animation: spin 1s linear infinite;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
 }
 
 @keyframes spin {
