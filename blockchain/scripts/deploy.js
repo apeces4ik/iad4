@@ -10,38 +10,38 @@ async function main() {
   console.log("📝 Deploying with account:", deployer.address);
 
   const balance = await hre.ethers.provider.getBalance(deployer.address);
-  console.log("💰 Account balance:", hre.ethers.formatEther(balance), "ETH\n");
+  console.log("💰 Account balance:", hre.ethers.utils.formatEther(balance), "ETH\n");
 
   // 1. Deploy AETH Token
   console.log("1️⃣  Deploying AETHToken...");
   const AETHToken = await hre.ethers.getContractFactory("AETHToken");
   const aethToken = await AETHToken.deploy();
-  await aethToken.waitForDeployment();
-  const aethAddress = await aethToken.getAddress();
+  await aethToken.deployed();
+  const aethAddress = aethToken.address;
   console.log("✅ AETHToken deployed to:", aethAddress);
 
   // 2. Deploy MinerNode
   console.log("\n2️⃣  Deploying MinerNode...");
   const MinerNode = await hre.ethers.getContractFactory("MinerNode");
   const minerNode = await MinerNode.deploy(aethAddress);
-  await minerNode.waitForDeployment();
-  const minerNodeAddress = await minerNode.getAddress();
+  await minerNode.deployed();
+  const minerNodeAddress = minerNode.address;
   console.log("✅ MinerNode deployed to:", minerNodeAddress);
 
   // 3. Deploy VPNSession
   console.log("\n3️⃣  Deploying VPNSession...");
   const VPNSession = await hre.ethers.getContractFactory("VPNSession");
   const vpnSession = await VPNSession.deploy(aethAddress, minerNodeAddress);
-  await vpnSession.waitForDeployment();
-  const vpnSessionAddress = await vpnSession.getAddress();
+  await vpnSession.deployed();
+  const vpnSessionAddress = vpnSession.address;
   console.log("✅ VPNSession deployed to:", vpnSessionAddress);
 
   // 4. Deploy Validator
   console.log("\n4️⃣  Deploying Validator...");
   const Validator = await hre.ethers.getContractFactory("Validator");
   const validator = await Validator.deploy(aethAddress);
-  await validator.waitForDeployment();
-  const validatorAddress = await validator.getAddress();
+  await validator.deployed();
+  const validatorAddress = validator.address;
   console.log("✅ Validator deployed to:", validatorAddress);
 
   // Configure contracts
