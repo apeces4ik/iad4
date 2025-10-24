@@ -488,14 +488,6 @@ async def root():
 # Include routers
 app.include_router(api_router)
 
-# Blockchain integration
-try:
-    from blockchain.routes import router as blockchain_router
-    app.include_router(blockchain_router, prefix="/api")
-    logger.info("Blockchain integration enabled")
-except Exception as e:
-    logger.warning(f"Blockchain integration disabled: {e}")
-
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
@@ -510,6 +502,14 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Blockchain integration
+try:
+    from blockchain.routes import router as blockchain_router
+    app.include_router(blockchain_router, prefix="/api")
+    logger.info("Blockchain integration enabled")
+except Exception as e:
+    logger.warning(f"Blockchain integration disabled: {e}")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
