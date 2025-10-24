@@ -240,7 +240,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Dashboard Blockchain Integration"
     - "Staking Page Blockchain Integration"
     - "Node Management Blockchain Integration"
   stuck_tasks: []
