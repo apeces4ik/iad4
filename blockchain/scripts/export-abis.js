@@ -41,6 +41,7 @@ export const CONTRACTS = {
   MinerNode: "${deployment.contracts.MinerNode}",
   VPNSession: "${deployment.contracts.VPNSession}",
   Validator: "${deployment.contracts.Validator}",
+  PremiumVPN: "${deployment.contracts.PremiumVPN}",
 };
 
 export const CHAIN_ID = ${deployment.chainId};
@@ -51,12 +52,14 @@ import AETHTokenABI from "./AETHToken.json";
 import MinerNodeABI from "./MinerNode.json";
 import VPNSessionABI from "./VPNSession.json";
 import ValidatorABI from "./Validator.json";
+import PremiumVPNABI from "./PremiumVPN.json";
 
 export const ABIS = {
   AETHToken: AETHTokenABI.abi,
   MinerNode: MinerNodeABI.abi,
   VPNSession: VPNSessionABI.abi,
   Validator: ValidatorABI.abi,
+  PremiumVPN: PremiumVPNABI.abi,
 };
 `;
 
