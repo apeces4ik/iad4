@@ -424,6 +424,45 @@
       "artifacts": [
         "MinerNode"
       ]
+    },
+    "/app/blockchain/contracts/PremiumVPN.sol": {
+      "lastModificationDate": 1761338228288,
+      "contentHash": "1e57199c3bfe512eacf0868b958a36e0",
+      "sourceName": "contracts/PremiumVPN.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IAETHToken",
+        "PremiumVPN"
+      ]
     }
   }
 }
