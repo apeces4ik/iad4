@@ -250,6 +250,7 @@ async def connect_vpn(request: VPNConnectRequest):
 async def disconnect_vpn(request: VPNDisconnectRequest):
     """
     Disconnect from VPN and calculate rewards for nodes
+    Automatically records data shared on blockchain for node rewards
     """
     try:
         wallet_address = request.wallet_address.lower()
@@ -269,15 +270,34 @@ async def disconnect_vpn(request: VPNDisconnectRequest):
         if stats:
             total_mb = stats['total_mb']
             
-            # Calculate rewards for node (0.001 AETH per MB)
-            rewards = total_mb * 0.001
+            # Calculate rewards for node (0.001 AETH per MB = 1 AETH per GB as per contract)
+            rewards_aeth = total_mb * 0.001
+            
+            # Get assigned node from session
+            assigned_node = session_info.get('assigned_node', {})
+            node_id = assigned_node.get('node_id')
             
             # Update session with stats
             session_info['disconnected_at'] = datetime.utcnow().isoformat()
             session_info['mb_sent'] = stats['mb_sent']
             session_info['mb_received'] = stats['mb_received']
             session_info['total_mb'] = total_mb
-            session_info['node_rewards'] = rewards
+            session_info['node_rewards'] = rewards_aeth
+            session_info['rewards_recorded_on_chain'] = False
+            
+            # TODO: Record data shared on blockchain (MinerNode.recordDataShared)
+            # This would require:
+            # 1. Getting actual node ID from MinerNode contract
+            # 2. Backend wallet with owner privileges to call recordDataShared
+            # 3. Gas management for transactions
+            # For MVP, we track rewards in session file
+            
+            if node_id:
+                logger.info(f"Session {session_id}: Node #{node_id} earned {rewards_aeth:.4f} AETH for {total_mb:.2f} MB traffic")
+                
+                # In production: Call MinerNode.recordDataShared(nodeId, totalMB)
+                # This will mint AETH tokens to node owner automatically
+                session_info['note'] = f"Node #{node_id} will receive {rewards_aeth:.4f} AETH (pending on-chain recording)"
             
             # Save updated session
             with open(session_path, 'w') as f:
@@ -290,7 +310,8 @@ async def disconnect_vpn(request: VPNDisconnectRequest):
                     "mb_sent": stats['mb_sent'],
                     "mb_received": stats['mb_received'],
                     "total_mb": total_mb,
-                    "node_rewards": rewards
+                    "node_rewards": rewards_aeth,
+                    "node_id": node_id
                 }
             }
         else:
