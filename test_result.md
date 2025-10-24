@@ -149,6 +149,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE BACKEND TESTING COMPLETED - All blockchain endpoints working correctly: /api/blockchain/status (connected: true, all contract addresses correct), /api/blockchain/contracts (all 4 contracts present), /api/blockchain/balance (returns balance/staked/rewards), /api/blockchain/nodes/owner (returns nodes array), /api/blockchain/sessions/user (returns sessions array), /api/blockchain/validator (returns validator info). Existing API endpoints also working: health check, wallet connection, dashboard stats. 24 tests passed, 0 failed. Minor: Invalid address handling returns 200 with zeros instead of 500 error (graceful handling). Hardhat node connected successfully on localhost:8545."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-VERIFIED BLOCKCHAIN API ENDPOINTS - All 6 requested endpoints tested and working: (1) /api/blockchain/status: connected=true, all contract addresses correct, (2) /api/blockchain/contracts: all 4 contracts present with correct addresses, (3) /api/blockchain/balance/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266: balance=1000000000.0 AETH (expected for deployer account), staked=0.0, pendingRewards=0.0, (4) /api/blockchain/nodes/owner/{address}: returns empty nodes array (expected for new accounts), (5) /api/blockchain/sessions/user/{address}: returns empty sessions array (expected), (6) /api/blockchain/validator/{address}: returns validator info with isValidator=true. All endpoints return 200 OK with correct data structures. Backend blockchain integration is production-ready."
 
 frontend:
   - task: "Contract ABIs Export"
