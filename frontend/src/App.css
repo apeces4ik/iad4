@@ -1596,6 +1596,16 @@ h1, h2, h3, h4 {
   transition: all 0.4s ease;
   position: relative;
   overflow: hidden;
+  color: var(--text-primary) !important;
+}
+
+.staking-form-card * {
+  color: inherit;
+}
+
+.staking-form-card h3,
+.staking-form-card label {
+  color: var(--text-primary) !important;
 }
 
 .staking-form-card::before {
