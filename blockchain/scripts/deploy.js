@@ -44,6 +44,14 @@ async function main() {
   const validatorAddress = validator.address;
   console.log("✅ Validator deployed to:", validatorAddress);
 
+  // 5. Deploy PremiumVPN
+  console.log("\n5️⃣  Deploying PremiumVPN...");
+  const PremiumVPN = await hre.ethers.getContractFactory("PremiumVPN");
+  const premiumVPN = await PremiumVPN.deploy(aethAddress);
+  await premiumVPN.deployed();
+  const premiumVPNAddress = premiumVPN.address;
+  console.log("✅ PremiumVPN deployed to:", premiumVPNAddress);
+
   // Configure contracts
   console.log("\n⚙️  Configuring contracts...");
   
