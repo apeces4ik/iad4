@@ -304,13 +304,16 @@ const NodeManagement = () => {
             </div>
           ) : (
             <>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">🖥️ Your Nodes ({nodeIds.length})</h2>
+              <div className="flex justify-between items-center mb-4" style={{ color: 'var(--text-primary)' }}>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0 }}>
+                  🖥️ Your Nodes ({nodeIds.length})
+                </h2>
                 <Button 
                   onClick={handleRefresh} 
                   disabled={refreshing}
                   variant="outline"
                   size="sm"
+                  style={{ color: 'var(--text-primary)' }}
                 >
                   <RefreshCw className={refreshing ? "animate-spin" : ""} size={16} />
                   Refresh
