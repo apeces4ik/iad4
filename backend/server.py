@@ -485,8 +485,16 @@ async def root():
         "status": "operational"
     }
 
-# Include router
+# Include routers
 app.include_router(api_router)
+
+# Blockchain integration
+try:
+    from blockchain.routes import router as blockchain_router
+    app.include_router(blockchain_router, prefix="/api")
+    logger.info("Blockchain integration enabled")
+except Exception as e:
+    logger.warning(f"Blockchain integration disabled: {e}")
 
 app.add_middleware(
     CORSMiddleware,
