@@ -6,7 +6,7 @@ import { useAETHToken, useMinerNode } from "@/hooks/useBlockchain";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wifi, Network, Coins, TrendingUp, LogOut, Menu, X } from "lucide-react";
+import { Wifi, Network, Coins, TrendingUp, LogOut, Menu, X, Crown } from "lucide-react";
 import { toast } from "sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
