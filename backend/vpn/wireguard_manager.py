@@ -151,33 +151,30 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
             raise
     
     def start_server(self):
-        """Start WireGuard server"""
+        """Start WireGuard server (MVP mode - simulated)"""
         try:
-            # Check if interface is already up
-            result = subprocess.run(
-                ["sudo", "wg", "show", self.interface],
-                capture_output=True,
-                text=True
-            )
+            logger.info(f"WireGuard server starting in MVP mode (config generation only)")
+            logger.info(f"Note: In production, this would start actual WireGuard interface {self.interface}")
+            # For MVP, we just mark as "running" by creating a status file
+            status_dir = Path("/app/backend/vpn/status")
+            status_dir.mkdir(parents=True, exist_ok=True)
+            status_file = status_dir / "server_running"
+            status_file.write_text(datetime.utcnow().isoformat())
+            logger.info(f"WireGuard server status: running (MVP simulation mode)")
             
-            if result.returncode == 0:
-                logger.info(f"WireGuard interface {self.interface} is already running")
-                return
-            
-            # Bring up the interface
-            subprocess.run(["sudo", "wg-quick", "up", self.interface], check=True)
-            logger.info(f"WireGuard server started on {self.interface}")
-            
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             logger.error(f"Failed to start WireGuard server: {e}")
             raise Exception("Failed to start WireGuard server")
     
     def stop_server(self):
-        """Stop WireGuard server"""
+        """Stop WireGuard server (MVP mode - simulated)"""
         try:
-            subprocess.run(["sudo", "wg-quick", "down", self.interface], check=True)
-            logger.info(f"WireGuard server stopped on {self.interface}")
-        except subprocess.CalledProcessError as e:
+            logger.info(f"WireGuard server stopping (MVP mode)")
+            status_file = Path("/app/backend/vpn/status/server_running")
+            if status_file.exists():
+                status_file.unlink()
+            logger.info(f"WireGuard server stopped")
+        except Exception as e:
             logger.error(f"Failed to stop WireGuard server: {e}")
             raise Exception("Failed to stop WireGuard server")
     
