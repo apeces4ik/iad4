@@ -122,7 +122,15 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
             config_path.chmod(0o600)
             
             # Enable IP forwarding
-            subprocess.run(["sysctl", "-w", "net.ipv4.ip_forward=1"], check=True)
+            try:
+                subprocess.run(["sudo", "sysctl", "-w", "net.ipv4.ip_forward=1"], check=True)
+            except subprocess.CalledProcessError:
+                logger.warning("Failed to enable IP forwarding with sysctl, trying alternative method")
+                # Alternative: write directly to proc
+                try:
+                    subprocess.run(["sudo", "sh", "-c", "echo 1 > /proc/sys/net/ipv4/ip_forward"], check=True)
+                except Exception as e2:
+                    logger.warning(f"Could not enable IP forwarding: {e2}")
             
             logger.info(f"WireGuard server configured at {config_path}")
             
