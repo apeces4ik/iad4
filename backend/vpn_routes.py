@@ -395,6 +395,63 @@ async def get_server_status():
         logger.error(f"Failed to get server status: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get status: {str(e)}")
 
+@router.get("/rewards/pending")
+async def get_pending_rewards():
+    """
+    Get total pending rewards across all sessions (not yet recorded on blockchain)
+    Used for monitoring and batch processing
+    """
+    try:
+        sessions_dir = "/app/backend/vpn/sessions"
+        if not os.path.exists(sessions_dir):
+            return {
+                "total_pending_rewards": 0.0,
+                "sessions_count": 0,
+                "total_traffic_mb": 0.0
+            }
+        
+        total_rewards = 0.0
+        total_traffic = 0.0
+        sessions_count = 0
+        rewards_by_node = {}
+        
+        for session_file in Path(sessions_dir).glob("*.json"):
+            try:
+                with open(session_file, 'r') as f:
+                    session = json.load(f)
+                
+                # Only count sessions that haven't been recorded on chain
+                if not session.get('rewards_recorded_on_chain', False) and session.get('node_rewards'):
+                    node_id = session.get('assigned_node', {}).get('node_id')
+                    rewards = session.get('node_rewards', 0.0)
+                    traffic_mb = session.get('total_mb', 0.0)
+                    
+                    total_rewards += rewards
+                    total_traffic += traffic_mb
+                    sessions_count += 1
+                    
+                    if node_id:
+                        if node_id not in rewards_by_node:
+                            rewards_by_node[node_id] = {'rewards': 0.0, 'traffic_mb': 0.0, 'sessions': 0}
+                        rewards_by_node[node_id]['rewards'] += rewards
+                        rewards_by_node[node_id]['traffic_mb'] += traffic_mb
+                        rewards_by_node[node_id]['sessions'] += 1
+                        
+            except Exception as e:
+                logger.warning(f"Failed to process session {session_file}: {e}")
+        
+        return {
+            "total_pending_rewards": round(total_rewards, 4),
+            "sessions_count": sessions_count,
+            "total_traffic_mb": round(total_traffic, 2),
+            "rewards_by_node": rewards_by_node,
+            "note": "These rewards are pending blockchain recording via MinerNode.recordDataShared()"
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get pending rewards: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get pending rewards: {str(e)}")
+
 @router.get("/premium/prices")
 async def get_premium_prices():
     """Get premium subscription prices"""
