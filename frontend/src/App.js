@@ -60,6 +60,14 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/premium"
+        element={
+          <ProtectedRoute>
+            <PremiumPage />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
