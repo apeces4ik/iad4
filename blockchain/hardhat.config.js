@@ -11,11 +11,7 @@ export default {
   },
   networks: {
     hardhat: {
-      chainId: 1337,
-      mining: {
-        auto: true,
-        interval: 0
-      }
+      chainId: 1337
     },
     localhost: {
       url: "http://127.0.0.1:8545",
