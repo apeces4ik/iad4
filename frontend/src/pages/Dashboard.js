@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAccount } from "wagmi";
+import { useAETHToken, useMinerNode } from "@/hooks/useBlockchain";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,25 +15,47 @@ const API = `${BACKEND_URL}/api`;
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, token, logout } = useAuth();
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  const [nodeStats, setNodeStats] = useState({ totalEarnings: 0, totalDataShared: 0 });
+  
+  // Blockchain hooks
+  const { address } = useAccount();
+  const walletAddress = address || user?.wallet_address;
+  
+  // Get AETH balance and staking info from blockchain
+  const { balance, stakeInfo, refetchBalance, refetchStakeInfo } = useAETHToken(walletAddress);
+  
+  // Get user's nodes from blockchain
+  const { nodeIds, refetchNodes } = useMinerNode(walletAddress);
+  
+  // Fetch additional node stats from backend
   useEffect(() => {
-    fetchStats();
-  }, []);
+    if (walletAddress) {
+      fetchNodeStats();
+    }
+  }, [walletAddress, nodeIds]);
 
-  const fetchStats = async () => {
+  const fetchNodeStats = async () => {
     try {
+      // Get detailed node stats from backend
       const response = await axios.get(`${API}/dashboard/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setStats(response.data);
+      setNodeStats({
+        totalEarnings: response.data.total_earnings || 0,
+        totalDataShared: response.data.total_data_shared || 0,
+      });
     } catch (error) {
-      toast.error("Failed to load dashboard stats");
-    } finally {
-      setLoading(false);
+      console.error("Failed to load node stats:", error);
     }
+  };
+
+  // Refresh all blockchain data
+  const refreshData = () => {
+    refetchBalance();
+    refetchStakeInfo();
+    refetchNodes();
+    fetchNodeStats();
   };
 
   const handleLogout = () => {
