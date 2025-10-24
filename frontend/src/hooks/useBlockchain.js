@@ -363,3 +363,163 @@ export function useValidatorWrite() {
     error,
   };
 }
+
+/**
+ * Hook for reading Premium VPN data
+ */
+export function usePremiumVPN(address) {
+  // Check if user is premium
+  const { data: isPremium, refetch: refetchPremium } = useReadContract({
+    address: CONTRACTS.PremiumVPN,
+    abi: ABIS.PremiumVPN,
+    functionName: "isPremium",
+    args: address ? [address] : undefined,
+    enabled: !!address,
+  });
+
+  // Get premium info
+  const { data: premiumInfo, refetch: refetchPremiumInfo } = useReadContract({
+    address: CONTRACTS.PremiumVPN,
+    abi: ABIS.PremiumVPN,
+    functionName: "getPremiumInfo",
+    args: address ? [address] : undefined,
+    enabled: !!address,
+  });
+
+  // Get user stats
+  const { data: userStats, refetch: refetchUserStats } = useReadContract({
+    address: CONTRACTS.PremiumVPN,
+    abi: ABIS.PremiumVPN,
+    functionName: "getUserStats",
+    args: address ? [address] : undefined,
+    enabled: !!address,
+  });
+
+  // Get pricing
+  const { data: monthlyPrice } = useReadContract({
+    address: CONTRACTS.PremiumVPN,
+    abi: ABIS.PremiumVPN,
+    functionName: "premiumMonthlyPrice",
+  });
+
+  const { data: yearlyPrice } = useReadContract({
+    address: CONTRACTS.PremiumVPN,
+    abi: ABIS.PremiumVPN,
+    functionName: "premiumYearlyPrice",
+  });
+
+  const { data: burnAmount } = useReadContract({
+    address: CONTRACTS.PremiumVPN,
+    abi: ABIS.PremiumVPN,
+    functionName: "burnAmountPerConnection",
+  });
+
+  // Get global stats
+  const { data: globalStats } = useReadContract({
+    address: CONTRACTS.PremiumVPN,
+    abi: ABIS.PremiumVPN,
+    functionName: "getGlobalStats",
+  });
+
+  return {
+    isPremium: isPremium || false,
+    premiumInfo: premiumInfo
+      ? {
+          isActive: premiumInfo[0],
+          expiryTime: Number(premiumInfo[1]),
+          subscribedAt: Number(premiumInfo[2]),
+          totalConnections: Number(premiumInfo[3]),
+          daysRemaining: Number(premiumInfo[4]),
+        }
+      : null,
+    userStats: userStats
+      ? {
+          totalConnections: Number(userStats[0]),
+          totalBurned: Number(userStats[1]) / 1e18,
+          lastConnectionTime: Number(userStats[2]),
+        }
+      : null,
+    pricing: {
+      monthly: monthlyPrice ? Number(monthlyPrice) / 1e18 : 1000,
+      yearly: yearlyPrice ? Number(yearlyPrice) / 1e18 : 10000,
+      burnPerConnection: burnAmount ? Number(burnAmount) / 1e18 : 10,
+    },
+    globalStats: globalStats
+      ? {
+          totalBurned: Number(globalStats[0]) / 1e18,
+          totalConnections: Number(globalStats[1]),
+          totalPremiumUsers: Number(globalStats[2]),
+        }
+      : null,
+    refetchPremium,
+    refetchPremiumInfo,
+    refetchUserStats,
+  };
+}
+
+/**
+ * Hook for Premium VPN write operations
+ */
+export function usePremiumVPNWrite() {
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({ hash });
+
+  // Subscribe premium monthly
+  const subscribePremiumMonthly = async () => {
+    return writeContract({
+      address: CONTRACTS.PremiumVPN,
+      abi: ABIS.PremiumVPN,
+      functionName: "subscribePremiumMonthly",
+    });
+  };
+
+  // Subscribe premium yearly
+  const subscribePremiumYearly = async () => {
+    return writeContract({
+      address: CONTRACTS.PremiumVPN,
+      abi: ABIS.PremiumVPN,
+      functionName: "subscribePremiumYearly",
+    });
+  };
+
+  return {
+    subscribePremiumMonthly,
+    subscribePremiumYearly,
+    hash,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+  };
+}
+
+/**
+ * Hook for AETH Token approval (needed before subscribing to premium)
+ */
+export function useAETHApproval() {
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({ hash });
+
+  const approve = async (spender, amount) => {
+    const amountWei = BigInt(Math.floor(amount * 1e18));
+    return writeContract({
+      address: CONTRACTS.AETHToken,
+      abi: ABIS.AETHToken,
+      functionName: "approve",
+      args: [spender, amountWei],
+    });
+  };
+
+  return {
+    approve,
+    hash,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+  };
+}
