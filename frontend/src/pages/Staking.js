@@ -287,18 +287,19 @@ const Staking = () => {
                           onChange={(e) => setStakeAmount(e.target.value)}
                           placeholder="0.00"
                           data-testid="stake-input"
+                          disabled={isPending || isConfirming}
                         />
                         <div className="balance-info">
-                          Available: {user?.aeth_balance?.toFixed(2) || "0.00"} $AETH
+                          Available: {balance.toFixed(2)} $AETH
                         </div>
                       </div>
                       <Button
                         type="submit"
-                        disabled={processing}
+                        disabled={isPending || isConfirming}
                         className="w-full stake-btn"
                         data-testid="stake-submit-btn"
                       >
-                        {processing ? "Processing..." : "Stake Tokens"}
+                        {isPending ? "Waiting for wallet..." : isConfirming ? "Confirming..." : "Stake Tokens"}
                       </Button>
                     </form>
                   </CardContent>
@@ -324,20 +325,36 @@ const Staking = () => {
                           onChange={(e) => setUnstakeAmount(e.target.value)}
                           placeholder="0.00"
                           data-testid="unstake-input"
+                          disabled={isPending || isConfirming}
                         />
                         <div className="balance-info">
-                          Staked: {stakingData?.staked_aeth?.toFixed(2) || "0.00"} $AETH
+                          Staked: {stakeInfo.amount.toFixed(2)} $AETH
+                          {stakeInfo.pendingRewards > 0 && (
+                            <span className="text-green-500"> (+{stakeInfo.pendingRewards.toFixed(4)} rewards)</span>
+                          )}
                         </div>
                       </div>
                       <Button
                         type="submit"
-                        disabled={processing}
+                        disabled={isPending || isConfirming}
                         className="w-full unstake-btn"
                         data-testid="unstake-submit-btn"
                       >
-                        {processing ? "Processing..." : "Unstake Tokens"}
+                        {isPending ? "Waiting for wallet..." : isConfirming ? "Confirming..." : "Unstake Tokens"}
                       </Button>
                     </form>
+                    
+                    {stakeInfo.pendingRewards > 0 && (
+                      <Button
+                        onClick={handleClaimRewards}
+                        disabled={isPending || isConfirming}
+                        className="w-full mt-3"
+                        variant="outline"
+                      >
+                        <Coins size={18} className="mr-2" />
+                        Claim {stakeInfo.pendingRewards.toFixed(4)} AETH Rewards
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               </div>
