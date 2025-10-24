@@ -234,6 +234,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "✅ IMPLEMENTED - Integrated NodeManagement page with blockchain. Features: (1) useMinerNode hook for reading user's node IDs, (2) useNodeInfo hook for each node's details (location, bandwidth, data shared, earnings, reputation, active status), (3) useMinerNodeWrite hook for registerNode and deactivateNode transactions, (4) NodeCard component for displaying individual nodes with blockchain data, (5) UI updates: blockchain badges, refresh button, wallet connection check, transaction states. All nodes now loaded from smart contract MinerNode."
+      - working: "NA"
+        agent: "main"
+        comment: "🎨 UI FIX - Fixed node registration dialog white text issue. Added dark theme styles for dialog, form inputs, select dropdown. All text now visible with proper contrast. Dialog background: dark with cyan border, inputs: dark with proper focus states, dropdown: dark themed. User reported issue resolved."
 
 metadata:
   created_by: "main_agent"
