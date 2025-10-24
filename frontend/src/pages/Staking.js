@@ -1,91 +1,125 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import axios from "axios";
+import { useAccount } from "wagmi";
+import { useAETHToken, useAETHTokenWrite } from "@/hooks/useBlockchain";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Wifi, TrendingUp, Network, Coins, LogOut, Menu, X, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Wifi, TrendingUp, Network, Coins, LogOut, Menu, X, ArrowUpRight, ArrowDownRight, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const Staking = () => {
   const navigate = useNavigate();
-  const { user, token, logout } = useAuth();
-  const [stakingData, setStakingData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, logout } = useAuth();
+  const { address, isConnected } = useAccount();
+  
+  // Blockchain hooks
+  const { balance, stakeInfo, totalStaked, refetchBalance, refetchStakeInfo } = useAETHToken(address);
+  const { stake, unstake, claimRewards, isPending, isConfirming, isConfirmed, error } = useAETHTokenWrite();
+  
   const [stakeAmount, setStakeAmount] = useState("");
   const [unstakeAmount, setUnstakeAmount] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [processing, setProcessing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
+  // Watch for transaction confirmation
   useEffect(() => {
-    fetchStakingData();
-  }, []);
-
-  const fetchStakingData = async () => {
-    try {
-      const response = await axios.get(`${API}/staking/balance`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setStakingData(response.data);
-    } catch (error) {
-      toast.error("Failed to load staking data");
-    } finally {
-      setLoading(false);
+    if (isConfirmed) {
+      toast.success("Transaction confirmed!");
+      handleRefresh();
+      setStakeAmount("");
+      setUnstakeAmount("");
     }
+  }, [isConfirmed]);
+
+  // Watch for errors
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message || "Transaction failed");
+    }
+  }, [error]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([refetchBalance(), refetchStakeInfo()]);
+    setRefreshing(false);
   };
 
   const handleStake = async (e) => {
     e.preventDefault();
     const amount = parseFloat(stakeAmount);
+    
+    if (!isConnected) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+    
     if (!amount || amount <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
 
-    setProcessing(true);
+    if (amount > balance) {
+      toast.error("Insufficient balance");
+      return;
+    }
+
     try {
-      await axios.post(
-        `${API}/staking/stake`,
-        { amount },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      toast.success(`Successfully staked ${amount} $AETH!`);
-      setStakeAmount("");
-      fetchStakingData();
-    } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to stake tokens");
-    } finally {
-      setProcessing(false);
+      await stake(amount);
+      toast.info("Transaction submitted! Waiting for confirmation...");
+    } catch (err) {
+      console.error("Stake error:", err);
+      toast.error(err.message || "Failed to stake tokens");
     }
   };
 
   const handleUnstake = async (e) => {
     e.preventDefault();
     const amount = parseFloat(unstakeAmount);
+    
+    if (!isConnected) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+    
     if (!amount || amount <= 0) {
       toast.error("Please enter a valid amount");
       return;
     }
 
-    setProcessing(true);
+    if (amount > stakeInfo.amount) {
+      toast.error("Insufficient staked amount");
+      return;
+    }
+
     try {
-      const response = await axios.post(
-        `${API}/staking/unstake`,
-        { amount },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      toast.success(`Unstaked ${amount} $AETH + ${response.data.rewards.toFixed(2)} rewards!`);
-      setUnstakeAmount("");
-      fetchStakingData();
-    } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to unstake tokens");
-    } finally {
-      setProcessing(false);
+      await unstake(amount);
+      toast.info("Transaction submitted! Waiting for confirmation...");
+    } catch (err) {
+      console.error("Unstake error:", err);
+      toast.error(err.message || "Failed to unstake tokens");
+    }
+  };
+
+  const handleClaimRewards = async () => {
+    if (!isConnected) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
+
+    if (stakeInfo.pendingRewards <= 0) {
+      toast.error("No rewards to claim");
+      return;
+    }
+
+    try {
+      await claimRewards();
+      toast.info("Claiming rewards... Waiting for confirmation...");
+    } catch (err) {
+      console.error("Claim error:", err);
+      toast.error(err.message || "Failed to claim rewards");
     }
   };
 
