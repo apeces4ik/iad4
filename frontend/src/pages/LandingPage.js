@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Wifi, Shield, Coins, Network, ChevronRight, Zap } from "lucide-react";
+import { Wifi, Shield, Coins, Network, ChevronRight, Zap, Sparkles } from "lucide-react";
+import ParticlesBackground from "@/components/ParticlesBackground";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -46,6 +47,7 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
+      <ParticlesBackground />
       <div className="hero-section">
         <nav className="nav-bar">
           <div className="logo" data-testid="logo">
@@ -66,8 +68,27 @@ const LandingPage = () => {
               disabled={isConnecting}
               className="cta-button"
             >
-              {isConnecting ? "Connecting..." : isAuthenticated ? "Go to Dashboard" : isConnected ? "Sign to Continue" : "Connect Wallet"}
-              <ChevronRight className="ml-2" size={18} />
+              {isConnecting ? (
+                <>
+                  <Sparkles size={18} />
+                  Connecting...
+                </>
+              ) : isAuthenticated ? (
+                <>
+                  Go to Dashboard
+                  <ChevronRight size={18} />
+                </>
+              ) : isConnected ? (
+                <>
+                  Sign to Continue
+                  <ChevronRight size={18} />
+                </>
+              ) : (
+                <>
+                  Connect Wallet
+                  <ChevronRight size={18} />
+                </>
+              )}
             </Button>
           </div>
         </nav>
@@ -163,8 +184,17 @@ const LandingPage = () => {
             size="lg"
             className="cta-button-large"
           >
-            {isConnecting ? "Connecting..." : "Get Started Now"}
-            <ChevronRight className="ml-2" size={20} />
+            {isConnecting ? (
+              <>
+                <Sparkles size={20} />
+                Connecting...
+              </>
+            ) : (
+              <>
+                Get Started Now
+                <ChevronRight size={20} />
+              </>
+            )}
           </Button>
         </div>
       </div>
