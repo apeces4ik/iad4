@@ -68,15 +68,37 @@ h1, h2, h3, h4 {
 
 .landing-page {
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-section {
   min-height: 100vh;
-  background: radial-gradient(ellipse at top, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
-              radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
-              var(--bg-dark);
+  background: 
+    linear-gradient(180deg, rgba(10, 10, 15, 0.95) 0%, rgba(10, 10, 15, 0.85) 100%),
+    url('https://images.unsplash.com/photo-1655993810480-c15dccf9b3a0?w=1920&q=80') center/cover no-repeat;
   position: relative;
   padding: 2rem;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+  animation: pulse-bg 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse-bg {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
 }
 
 .nav-bar {
