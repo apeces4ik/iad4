@@ -203,16 +203,19 @@ frontend:
         comment: "✅ IMPLEMENTED - Integrated Dashboard with blockchain hooks. Now displays: AETH Balance from useAETHToken (on-chain), Staked AETH with pending rewards (on-chain), Active Nodes count from useMinerNode (on-chain), Total Earnings from backend. Added refresh button and blockchain badges. Uses wagmi useAccount for wallet connection."
   
   - task: "Staking Page Blockchain Integration"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "/app/frontend/src/pages/Staking.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
         comment: "TODO: Update Staking page to use real blockchain transactions for stake/unstake"
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED - Integrated Staking page with blockchain. Features: (1) useAETHToken hook for reading balance, staked amount, pending rewards, total network staked, (2) useAETHTokenWrite hook for stake/unstake/claimRewards transactions, (3) Real-time transaction states (isPending, isConfirming, isConfirmed), (4) UI updates: blockchain badges, refresh button, wallet connection check, pending rewards display, claim rewards button. All data now comes from smart contract instead of API."
   
   - task: "Node Management Blockchain Integration"
     implemented: false
