@@ -189,33 +189,54 @@ const Staking = () => {
         </header>
 
         <div className="dashboard-content">
-          {loading ? (
+          {!isConnected ? (
             <div className="loading-state">
-              <div className="spinner"></div>
-              <p>Loading staking data...</p>
+              <div className="empty-icon">🔗</div>
+              <h2>Connect Your Wallet</h2>
+              <p>Please connect your MetaMask wallet to access staking features</p>
             </div>
           ) : (
             <div className="staking-container">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">💎 Staking Overview</h2>
+                <Button 
+                  onClick={handleRefresh} 
+                  disabled={refreshing}
+                  variant="outline"
+                  size="sm"
+                >
+                  <RefreshCw className={refreshing ? "animate-spin" : ""} size={16} />
+                  Refresh
+                </Button>
+              </div>
+
               <div className="staking-overview" data-testid="staking-overview">
-                <Card className="staking-stat-card">
+                <Card className="staking-stat-card blockchain-card">
                   <CardHeader>
-                    <CardTitle>Total Staked</CardTitle>
+                    <CardTitle>Your Staked</CardTitle>
+                    <span className="blockchain-badge">⛓️ On-Chain</span>
                   </CardHeader>
                   <CardContent>
                     <div className="stat-value-large">
-                      {stakingData?.staked_aeth?.toFixed(2) || "0.00"}
+                      {stakeInfo.amount.toFixed(2)}
                     </div>
                     <div className="stat-label">$AETH</div>
+                    {stakeInfo.pendingRewards > 0 && (
+                      <div className="text-green-500 text-sm mt-2">
+                        +{stakeInfo.pendingRewards.toFixed(4)} pending rewards
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
-                <Card className="staking-stat-card">
+                <Card className="staking-stat-card blockchain-card">
                   <CardHeader>
                     <CardTitle>Available Balance</CardTitle>
+                    <span className="blockchain-badge">⛓️ On-Chain</span>
                   </CardHeader>
                   <CardContent>
                     <div className="stat-value-large">
-                      {user?.aeth_balance?.toFixed(2) || "0.00"}
+                      {balance.toFixed(2)}
                     </div>
                     <div className="stat-label">$AETH</div>
                   </CardContent>
@@ -226,8 +247,21 @@ const Staking = () => {
                     <CardTitle>Est. APY</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="stat-value-large apy">{stakingData?.estimated_apy || "10%"}</div>
+                    <div className="stat-value-large apy">10%</div>
                     <div className="stat-label">Annual Percentage Yield</div>
+                  </CardContent>
+                </Card>
+
+                <Card className="staking-stat-card blockchain-card">
+                  <CardHeader>
+                    <CardTitle>Network Total Staked</CardTitle>
+                    <span className="blockchain-badge">⛓️ On-Chain</span>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="stat-value-large">
+                      {totalStaked.toFixed(0)}
+                    </div>
+                    <div className="stat-label">$AETH</div>
                   </CardContent>
                 </Card>
               </div>
