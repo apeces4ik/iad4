@@ -17,10 +17,7 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
   
-  // Temporary bypass for testing - REMOVE AFTER TESTING
-  const isTestMode = window.location.hostname.includes('preview.emergentagent.com');
-  
-  if (!isAuthenticated && !isTestMode) {
+  if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
   
