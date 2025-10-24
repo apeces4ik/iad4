@@ -340,9 +340,18 @@ const VPNConnectNew = () => {
                 )}
                 
                 {isPremium && !activeSession && (
-                  <p style={{ marginTop: "12px", padding: "12px", background: "rgba(16, 185, 129, 0.1)", borderRadius: "8px", fontSize: "14px", color: "var(--text-primary)" }}>
-                    ✨ Premium: No token burning required
-                  </p>
+                  <div style={{ marginTop: "12px", padding: "16px", background: "linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15))", borderRadius: "12px", border: "1px solid rgba(102, 126, 234, 0.3)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                      <Crown size={18} color="#667eea" />
+                      <strong style={{ color: "var(--text-primary)", fontSize: "14px" }}>Premium Benefits Active</strong>
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: "24px", fontSize: "13px", color: "var(--text-primary)" }}>
+                      <li>✨ No token burning</li>
+                      <li>🚀 Priority connection to best nodes (reputation &gt; 90)</li>
+                      <li>⚡ Higher bandwidth allocation</li>
+                      <li>🎯 Lower latency routing</li>
+                    </ul>
+                  </div>
                 )}
               </div>
 
