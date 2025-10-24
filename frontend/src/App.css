@@ -37,6 +37,32 @@ body {
   position: relative;
 }
 
+/* Fix for dark cards - ensure text is visible */
+[class*="card"],
+[class*="-card"],
+.card {
+  color: var(--text-primary);
+}
+
+[class*="card"] *:not(.stat-value),
+[class*="-card"] *:not(.stat-value),
+.card *:not(.stat-value) {
+  color: inherit;
+}
+
+[class*="card"] h1,
+[class*="card"] h2,
+[class*="card"] h3,
+[class*="card"] h4,
+[class*="card"] h5,
+[class*="card"] h6 {
+  color: var(--text-primary) !important;
+}
+
+[class*="card"] p {
+  color: var(--text-secondary) !important;
+}
+
 body::before {
   content: '';
   position: fixed;
