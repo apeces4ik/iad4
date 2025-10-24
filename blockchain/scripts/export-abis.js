@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const contracts = ["AETHToken", "MinerNode", "VPNSession", "Validator"];
+const contracts = ["AETHToken", "MinerNode", "VPNSession", "Validator", "PremiumVPN"];
 const artifactsDir = path.join(__dirname, "../artifacts/contracts");
 const outputDir = path.join(__dirname, "../../frontend/src/contracts");
 
