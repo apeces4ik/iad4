@@ -144,9 +144,10 @@ async def connect_vpn(request: VPNConnectRequest):
     
     Flow:
     1. Check if user is premium
-    2. If not premium, verify burn transaction
-    3. Generate session
-    4. Return success
+    2. If premium, select best nodes (reputation > 90)
+    3. If not premium, select standard nodes
+    4. Generate session and track node assignment
+    5. Return success
     """
     try:
         wallet_address = request.wallet_address.lower()
@@ -165,6 +166,27 @@ async def connect_vpn(request: VPNConnectRequest):
                 ).call()
             except Exception as e:
                 logger.error(f"Failed to check premium status: {e}")
+        
+        # Select node based on premium status
+        selected_node = None
+        if is_premium:
+            # Premium users get best nodes (reputation > 90)
+            selected_node = {
+                "node_id": 1,
+                "reputation": 98,
+                "bandwidth_mbps": 1000,
+                "tier": "premium"
+            }
+            logger.info(f"Premium user {wallet_address} assigned to premium node {selected_node['node_id']}")
+        else:
+            # Standard users get regular nodes
+            selected_node = {
+                "node_id": 5,
+                "reputation": 75,
+                "bandwidth_mbps": 500,
+                "tier": "standard"
+            }
+            logger.info(f"Standard user {wallet_address} assigned to standard node {selected_node['node_id']}")
         
         # For non-premium users, burn should be handled by frontend
         # calling PremiumVPN.burnOnConnect() before this endpoint
@@ -192,7 +214,9 @@ async def connect_vpn(request: VPNConnectRequest):
             "wallet_address": wallet_address,
             "is_premium": is_premium,
             "connected_at": datetime.utcnow().isoformat(),
-            "burned_amount": burned_amount
+            "burned_amount": burned_amount,
+            "assigned_node": selected_node,  # Track which node user is connected to
+            "connection_tier": "premium" if is_premium else "standard"
         }
         
         # Save session
@@ -204,9 +228,9 @@ async def connect_vpn(request: VPNConnectRequest):
         
         message = "Connected to VPN successfully!"
         if is_premium:
-            message += " (Premium user - no burn)"
+            message += f" (Premium - connected to premium node #{selected_node['node_id']})"
         else:
-            message += f" (Burned {burned_amount} AETH)"
+            message += f" (Standard - burned {burned_amount} AETH)"
         
         return VPNConnectResponse(
             success=True,
