@@ -232,7 +232,7 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
     
     def remove_peer(self, peer_id: str):
         """
-        Remove a peer from WireGuard server
+        Remove a peer from WireGuard server (MVP mode)
         
         Args:
             peer_id: Unique identifier for the peer
@@ -243,26 +243,12 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
             if not peer_info_path.exists():
                 raise Exception(f"Peer {peer_id} not found")
             
-            import json
-            peer_info = json.loads(peer_info_path.read_text())
-            public_key = peer_info['public_key']
-            
-            # Remove peer from server
-            subprocess.run([
-                "wg", "set", self.interface,
-                "peer", public_key,
-                "remove"
-            ], check=True)
-            
-            # Save configuration
-            subprocess.run(["wg-quick", "save", self.interface], check=True)
-            
-            # Delete peer info file
+            # Delete peer info file (no wg command needed for MVP)
             peer_info_path.unlink()
             
-            logger.info(f"Peer {peer_id} removed")
+            logger.info(f"Peer {peer_id} removed (MVP mode)")
             
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             logger.error(f"Failed to remove peer: {e}")
             raise Exception("Failed to remove peer from WireGuard")
     
