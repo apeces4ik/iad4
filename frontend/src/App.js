@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import VPNConnect from "./pages/VPNConnect";
 import NodeManagement from "./pages/NodeManagement";
 import Staking from "./pages/Staking";
+import PremiumPage from "./pages/PremiumPage";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import "@/App.css";
 
