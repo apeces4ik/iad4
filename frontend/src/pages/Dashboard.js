@@ -129,7 +129,16 @@ const Dashboard = () => {
             <Menu size={24} />
           </button>
           <h1 data-testid="dashboard-title">Dashboard</h1>
-          <div className="header-actions"></div>
+          <div className="header-actions">
+            <Button 
+              variant="outline" 
+              onClick={refreshData}
+              className="refresh-btn"
+              data-testid="refresh-btn"
+            >
+              🔄 Refresh
+            </Button>
+          </div>
         </header>
 
         <div className="dashboard-content">
