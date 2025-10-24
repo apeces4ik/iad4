@@ -252,14 +252,23 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
-      ✅ STAKING & NODE MANAGEMENT INTEGRATION COMPLETED
+      ✅ STAKING & NODE MANAGEMENT INTEGRATION COMPLETED + UI FIX
       
-      Just completed blockchain integration for:
+      Completed:
       1. Staking Page - Full blockchain integration with stake/unstake/claimRewards
       2. Node Management - Full blockchain integration with registerNode/deactivateNode
+      3. Dashboard UI Fix - Fixed dark text on dark background issue
+      
+      UI Improvements:
+      - Added global CSS rules for all dark cards
+      - All text now uses var(--text-primary) for visibility
+      - Fixed stat-card, action-card, node-card, staking-form-card, staking-info
+      - All headings forced to light color with !important
+      - Paragraphs use var(--text-secondary) for better contrast
       
       Both pages now use real smart contract data and transactions.
-      Ready for backend + frontend testing.
+      Backend testing: ✅ PASSED (all 6 endpoints working)
+      Frontend testing: User will test manually
       
   - agent: "main"
     message: |
