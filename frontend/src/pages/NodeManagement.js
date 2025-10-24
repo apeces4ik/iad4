@@ -260,60 +260,42 @@ const NodeManagement = () => {
         </header>
 
         <div className="dashboard-content">
-          {loading ? (
-            <div className="loading-state">
-              <div className="spinner"></div>
-              <p>Loading nodes...</p>
+          {!isConnected ? (
+            <div className="empty-state" data-testid="wallet-connect-prompt">
+              <Server size={64} className="empty-icon" />
+              <h2>Connect Your Wallet</h2>
+              <p>Please connect your MetaMask wallet to manage your nodes</p>
             </div>
-          ) : nodes.length === 0 ? (
+          ) : nodeIds.length === 0 ? (
             <div className="empty-state" data-testid="empty-state">
               <Server size={64} className="empty-icon" />
               <h2>No Nodes Yet</h2>
               <p>Register your first node to start earning $AETH tokens</p>
-              <Button onClick={() => setDialogOpen(true)}>
+              <Button onClick={() => setDialogOpen(true)} disabled={isPending || isConfirming}>
                 <Plus size={18} />
                 Register Your First Node
               </Button>
             </div>
           ) : (
-            <div className="nodes-grid" data-testid="nodes-grid">
-              {nodes.map((node) => (
-                <Card key={node.id} className="node-card" data-testid={`node-${node.id}`}>
-                  <div className="node-header">
-                    <div className="node-icon">
-                      <Server size={24} />
-                    </div>
-                    <div className={`node-status ${node.status}`}>
-                      <span className="status-dot"></span>
-                      {node.status}
-                    </div>
-                  </div>
-                  <div className="node-details">
-                    <h3>{node.location.replace("-", " ").toUpperCase()}</h3>
-                    <div className="node-stat">
-                      <span>IP Address:</span>
-                      <span>{node.ip_address}</span>
-                    </div>
-                    <div className="node-stat">
-                      <span>Bandwidth:</span>
-                      <span>{node.bandwidth_mbps} Mbps</span>
-                    </div>
-                    <div className="node-stat">
-                      <span>Uptime:</span>
-                      <span>{node.uptime_percentage.toFixed(1)}%</span>
-                    </div>
-                    <div className="node-stat">
-                      <span>Data Shared:</span>
-                      <span>{node.total_data_shared_gb.toFixed(2)} GB</span>
-                    </div>
-                    <div className="node-earnings">
-                      <span>Total Earnings</span>
-                      <span className="earnings-value">{node.total_earnings_aeth.toFixed(4)} $AETH</span>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
+            <>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">🖥️ Your Nodes ({nodeIds.length})</h2>
+                <Button 
+                  onClick={handleRefresh} 
+                  disabled={refreshing}
+                  variant="outline"
+                  size="sm"
+                >
+                  <RefreshCw className={refreshing ? "animate-spin" : ""} size={16} />
+                  Refresh
+                </Button>
+              </div>
+              <div className="nodes-grid" data-testid="nodes-grid">
+                {nodeIds.map((nodeId, index) => (
+                  <NodeCard key={nodeId.toString()} nodeId={nodeId} index={index} />
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>
