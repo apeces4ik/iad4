@@ -82,7 +82,7 @@ class WireGuardManager:
     
     def setup_server(self, public_endpoint: str) -> Dict[str, str]:
         """
-        Set up WireGuard server configuration
+        Set up WireGuard server configuration (MVP mode - generates configs without requiring root)
         
         Args:
             public_endpoint: Public IP or domain of the server
@@ -96,19 +96,31 @@ class WireGuardManager:
                 logger.info("Generating server keypair...")
                 private_key, public_key = self.generate_keypair()
                 
-                # Save keys
-                self.config_dir.mkdir(parents=True, exist_ok=True)
-                self.server_private_key_path.write_text(private_key)
-                self.server_private_key_path.chmod(0o600)
-                self.server_public_key_path.write_text(public_key)
+                # Save keys (use local directory for MVP without root)
+                local_config_dir = Path("/app/backend/vpn/config")
+                local_config_dir.mkdir(parents=True, exist_ok=True)
                 
-                logger.info(f"Server keys generated and saved to {self.config_dir}")
+                local_private_path = local_config_dir / f"{self.interface}_private.key"
+                local_public_path = local_config_dir / f"{self.interface}_public.key"
+                
+                local_private_path.write_text(private_key)
+                local_private_path.chmod(0o600)
+                local_public_path.write_text(public_key)
+                
+                # Update paths to local
+                self.server_private_key_path = local_private_path
+                self.server_public_key_path = local_public_path
+                
+                logger.info(f"Server keys generated and saved to {local_config_dir}")
             else:
                 private_key = self.server_private_key_path.read_text().strip()
                 public_key = self.server_public_key_path.read_text().strip()
             
-            # Create server configuration
-            config_path = self.config_dir / f"{self.interface}.conf"
+            # Create server configuration in local directory
+            local_config_dir = Path("/app/backend/vpn/config")
+            local_config_dir.mkdir(parents=True, exist_ok=True)
+            config_path = local_config_dir / f"{self.interface}.conf"
+            
             server_config = f"""[Interface]
 Address = {self.server_address}
 ListenPort = {self.server_port}
@@ -121,18 +133,8 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
             config_path.write_text(server_config)
             config_path.chmod(0o600)
             
-            # Enable IP forwarding
-            try:
-                subprocess.run(["sudo", "sysctl", "-w", "net.ipv4.ip_forward=1"], check=True)
-            except subprocess.CalledProcessError:
-                logger.warning("Failed to enable IP forwarding with sysctl, trying alternative method")
-                # Alternative: write directly to proc
-                try:
-                    subprocess.run(["sudo", "sh", "-c", "echo 1 > /proc/sys/net/ipv4/ip_forward"], check=True)
-                except Exception as e2:
-                    logger.warning(f"Could not enable IP forwarding: {e2}")
-            
-            logger.info(f"WireGuard server configured at {config_path}")
+            logger.info(f"WireGuard server configured at {config_path} (MVP mode - config only)")
+            logger.info("Note: For production, deploy on a server with root access to enable actual VPN")
             
             return {
                 "interface": self.interface,
@@ -140,7 +142,8 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
                 "server_address": self.server_address,
                 "server_port": self.server_port,
                 "public_endpoint": public_endpoint,
-                "config_path": str(config_path)
+                "config_path": str(config_path),
+                "mode": "mvp_config_only"
             }
             
         except Exception as e:
