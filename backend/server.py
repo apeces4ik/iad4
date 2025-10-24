@@ -511,6 +511,14 @@ try:
 except Exception as e:
     logger.warning(f"Blockchain integration disabled: {e}")
 
+# VPN integration
+try:
+    from vpn_routes import router as vpn_router
+    app.include_router(vpn_router, prefix="/api")
+    logger.info("VPN integration enabled")
+except Exception as e:
+    logger.warning(f"VPN integration disabled: {e}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
