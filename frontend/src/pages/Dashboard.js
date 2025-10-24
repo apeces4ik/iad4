@@ -68,6 +68,7 @@ const Dashboard = () => {
     { name: "VPN Connect", path: "/vpn", icon: Wifi },
     { name: "My Nodes", path: "/nodes", icon: Network },
     { name: "Staking", path: "/staking", icon: Coins },
+    { name: "Premium", path: "/premium", icon: Crown },
   ];
 
   return (
