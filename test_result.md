@@ -218,16 +218,19 @@ frontend:
         comment: "✅ IMPLEMENTED - Integrated Staking page with blockchain. Features: (1) useAETHToken hook for reading balance, staked amount, pending rewards, total network staked, (2) useAETHTokenWrite hook for stake/unstake/claimRewards transactions, (3) Real-time transaction states (isPending, isConfirming, isConfirmed), (4) UI updates: blockchain badges, refresh button, wallet connection check, pending rewards display, claim rewards button. All data now comes from smart contract instead of API."
   
   - task: "Node Management Blockchain Integration"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "/app/frontend/src/pages/NodeManagement.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
         comment: "TODO: Update NodeManagement to use blockchain for node registration and management"
+      - working: "NA"
+        agent: "main"
+        comment: "✅ IMPLEMENTED - Integrated NodeManagement page with blockchain. Features: (1) useMinerNode hook for reading user's node IDs, (2) useNodeInfo hook for each node's details (location, bandwidth, data shared, earnings, reputation, active status), (3) useMinerNodeWrite hook for registerNode and deactivateNode transactions, (4) NodeCard component for displaying individual nodes with blockchain data, (5) UI updates: blockchain badges, refresh button, wallet connection check, transaction states. All nodes now loaded from smart contract MinerNode."
 
 metadata:
   created_by: "main_agent"
