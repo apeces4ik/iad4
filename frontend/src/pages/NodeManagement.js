@@ -91,6 +91,71 @@ const NodeManagement = () => {
     { name: "Staking", path: "/staking", icon: Coins },
   ];
 
+  // Component to display individual node
+  const NodeCard = ({ nodeId, index }) => {
+    const { nodeInfo } = useNodeInfo(nodeId);
+
+    if (!nodeInfo) {
+      return (
+        <Card className="node-card" data-testid={`node-loading-${index}`}>
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Loading node...</p>
+          </div>
+        </Card>
+      );
+    }
+
+    return (
+      <Card key={nodeId.toString()} className="node-card blockchain-card" data-testid={`node-${nodeId.toString()}`}>
+        <div className="node-header">
+          <div className="node-icon">
+            <Server size={24} />
+          </div>
+          <div className={`node-status ${nodeInfo.isActive ? "active" : "inactive"}`}>
+            <span className="status-dot"></span>
+            {nodeInfo.isActive ? "Active" : "Inactive"}
+          </div>
+          <span className="blockchain-badge">⛓️</span>
+        </div>
+        <div className="node-details">
+          <h3>{nodeInfo.location.replace("-", " ").toUpperCase()}</h3>
+          <div className="node-stat">
+            <span>Node ID:</span>
+            <span>#{nodeId.toString()}</span>
+          </div>
+          <div className="node-stat">
+            <span>Bandwidth:</span>
+            <span>{nodeInfo.bandwidthMbps} Mbps</span>
+          </div>
+          <div className="node-stat">
+            <span>Data Shared:</span>
+            <span>{(nodeInfo.totalDataShared / 1024).toFixed(2)} GB</span>
+          </div>
+          <div className="node-stat">
+            <span>Reputation:</span>
+            <span>{nodeInfo.reputation}/100</span>
+          </div>
+          <div className="node-earnings">
+            <span>Total Earnings</span>
+            <span className="earnings-value">{nodeInfo.totalEarnings.toFixed(4)} $AETH</span>
+          </div>
+          {nodeInfo.isActive && (
+            <Button
+              onClick={() => handleDeactivateNode(nodeId)}
+              disabled={isPending || isConfirming}
+              variant="outline"
+              size="sm"
+              className="mt-3 w-full"
+            >
+              {isPending || isConfirming ? "Processing..." : "Deactivate Node"}
+            </Button>
+          )}
+        </div>
+      </Card>
+    );
+  };
+
   return (
     <div className="dashboard-layout">
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
