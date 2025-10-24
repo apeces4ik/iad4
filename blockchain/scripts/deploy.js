@@ -83,6 +83,7 @@ async function main() {
   envContent = envContent.replace(/MINER_NODE_ADDRESS=.*/g, "");
   envContent = envContent.replace(/VPN_SESSION_ADDRESS=.*/g, "");
   envContent = envContent.replace(/VALIDATOR_ADDRESS=.*/g, "");
+  envContent = envContent.replace(/PREMIUM_VPN_ADDRESS=.*/g, "");
   envContent = envContent.replace(/BLOCKCHAIN_RPC_URL=.*/g, "");
   
   // Add new addresses
@@ -91,6 +92,7 @@ async function main() {
   envContent += `MINER_NODE_ADDRESS="${minerNodeAddress}"\n`;
   envContent += `VPN_SESSION_ADDRESS="${vpnSessionAddress}"\n`;
   envContent += `VALIDATOR_ADDRESS="${validatorAddress}"\n`;
+  envContent += `PREMIUM_VPN_ADDRESS="${premiumVPNAddress}"\n`;
   envContent += `BLOCKCHAIN_RPC_URL="http://127.0.0.1:8545"\n`;
   
   fs.writeFileSync(backendEnvPath, envContent);
