@@ -905,9 +905,15 @@ h1, h2, h3, h4 {
   margin-bottom: 2rem;
 }
 
+.stat-card {
+  position: relative;
+}
+
 .quick-actions h2 {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   margin-bottom: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
 }
 
 .actions-grid {
@@ -917,30 +923,73 @@ h1, h2, h3, h4 {
 }
 
 .action-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: rgba(26, 26, 36, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 2rem;
+  border-radius: 1.5rem;
   cursor: pointer;
-  transition: transform 0.2s, border-color 0.2s;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at top left, rgba(6, 182, 212, 0.15), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.action-card:hover::before {
+  opacity: 1;
 }
 
 .action-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--primary-cyan);
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow: 0 20px 60px rgba(6, 182, 212, 0.3);
 }
 
 .action-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 1rem;
+  width: 64px;
+  height: 64px;
+  border-radius: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+  transition: all 0.4s ease;
 }
 
-.action-card h3 { margin-bottom: 0.5rem; }
-.action-card p { color: var(--text-secondary); font-size: 0.875rem; }
+.action-card:hover .action-icon {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 10px 40px currentColor;
+}
+
+.action-card h3 { 
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.action-card p { 
+  color: var(--text-secondary); 
+  font-size: 0.875rem;
+  position: relative;
+  z-index: 1;
+  line-height: 1.6;
+  font-weight: 500;
+}
 
 .vpn-container {
   max-width: 900px;
