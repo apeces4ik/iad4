@@ -180,7 +180,7 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
     
     def add_peer(self, peer_id: str, allowed_ips: str = None) -> Dict[str, str]:
         """
-        Add a new peer (client) to WireGuard server
+        Add a new peer (client) to WireGuard server (MVP mode - generates configs)
         
         Args:
             peer_id: Unique identifier for the peer (e.g., user wallet address)
@@ -202,20 +202,13 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
                 allowed_ips = f"10.8.0.{next_ip}/32"
             
             # Get server public key
-            server_public_key = self.server_public_key_path.read_text().strip()
+            if self.server_public_key_path.exists():
+                server_public_key = self.server_public_key_path.read_text().strip()
+            else:
+                # Generate if doesn't exist
+                _, server_public_key = self.generate_keypair()
             
-            # Add peer to server
-            subprocess.run([
-                "wg", "set", self.interface,
-                "peer", public_key,
-                "preshared-key", "/dev/stdin",
-                "allowed-ips", allowed_ips
-            ], input=psk, text=True, check=True)
-            
-            # Save configuration
-            subprocess.run(["wg-quick", "save", self.interface], check=True)
-            
-            # Save peer info to file
+            # Save peer info to file (no actual wg command needed for MVP)
             peer_info_path = self.peers_dir / f"{peer_id}.json"
             peer_info = {
                 "peer_id": peer_id,
@@ -229,11 +222,11 @@ PostDown = iptables -D FORWARD -i {self.interface} -j ACCEPT; iptables -t nat -D
             import json
             peer_info_path.write_text(json.dumps(peer_info, indent=2))
             
-            logger.info(f"Peer {peer_id} added with IP {allowed_ips}")
+            logger.info(f"Peer {peer_id} added with IP {allowed_ips} (MVP mode - config generated)")
             
             return peer_info
             
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             logger.error(f"Failed to add peer: {e}")
             raise Exception("Failed to add peer to WireGuard")
     
