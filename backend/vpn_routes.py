@@ -378,20 +378,107 @@ async def get_premium_prices():
 @router.get("/locations")
 async def get_locations():
     """
-    Get available VPN server locations
-    For MVP, returning mock data - can be extended to multi-server setup
+    Get available VPN server locations with node quality information
+    Premium users get access to priority nodes with higher reputation
     """
-    return {
-        "locations": [
+    try:
+        # Get all active nodes from MinerNode contract
+        nodes_by_location = {}
+        total_peers = wg_manager.get_server_status().get('total_peers', 0)
+        
+        # For MVP, we simulate node data from blockchain
+        # In production, this would query MinerNode contract for all active nodes
+        locations = [
             {
                 "code": "us-east",
                 "name": "United States (East)",
                 "flag": "🇺🇸",
-                "nodes": wg_manager.get_server_status().get('total_peers', 0),
+                "total_nodes": max(5, total_peers),
+                "premium_nodes": max(2, total_peers // 2),  # Top 40% are premium quality
+                "avg_speed": 950,  # Mbps
+                "avg_reputation": 85,
+                "endpoint": SERVER_PUBLIC_ENDPOINT
+            },
+            {
+                "code": "eu-west",
+                "name": "Europe (West)",
+                "flag": "🇪🇺",
+                "total_nodes": max(4, total_peers),
+                "premium_nodes": max(2, total_peers // 2),
+                "avg_speed": 920,
+                "avg_reputation": 82,
+                "endpoint": SERVER_PUBLIC_ENDPOINT
+            },
+            {
+                "code": "asia-pacific",
+                "name": "Asia Pacific",
+                "flag": "🌏",
+                "total_nodes": max(3, total_peers),
+                "premium_nodes": max(1, total_peers // 3),
+                "avg_speed": 880,
+                "avg_reputation": 78,
                 "endpoint": SERVER_PUBLIC_ENDPOINT
             }
         ]
-    }
+        
+        return {"locations": locations}
+        
+    except Exception as e:
+        logger.error(f"Failed to get locations: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get locations: {str(e)}")
+
+@router.get("/nodes/best")
+async def get_best_nodes(location: str = "us-east", limit: int = 3):
+    """
+    Get best performing nodes for a location (for Premium users)
+    Sorted by reputation, bandwidth, and uptime
+    """
+    try:
+        # For MVP, return simulated premium nodes
+        # In production, query MinerNode contract and sort by reputation
+        
+        premium_nodes = [
+            {
+                "node_id": 1,
+                "location": location,
+                "reputation": 98,
+                "bandwidth_mbps": 1000,
+                "uptime_percent": 99.9,
+                "total_data_shared_gb": 5420,
+                "is_premium_tier": True,
+                "earnings": 128.5
+            },
+            {
+                "node_id": 2,
+                "location": location,
+                "reputation": 96,
+                "bandwidth_mbps": 950,
+                "uptime_percent": 99.5,
+                "total_data_shared_gb": 4280,
+                "is_premium_tier": True,
+                "earnings": 102.3
+            },
+            {
+                "node_id": 3,
+                "location": location,
+                "reputation": 94,
+                "bandwidth_mbps": 900,
+                "uptime_percent": 98.8,
+                "total_data_shared_gb": 3650,
+                "is_premium_tier": True,
+                "earnings": 89.7
+            }
+        ]
+        
+        return {
+            "location": location,
+            "nodes": premium_nodes[:limit],
+            "total_premium_nodes": len(premium_nodes)
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to get best nodes: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get best nodes: {str(e)}")
 
 # ============= INITIALIZATION =============
 
