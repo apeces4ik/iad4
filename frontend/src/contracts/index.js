@@ -4,6 +4,7 @@ export const CONTRACTS = {
   MinerNode: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
   VPNSession: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
   Validator: "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+  PremiumVPN: "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
 };
 
 export const CHAIN_ID = 1337;
@@ -14,10 +15,12 @@ import AETHTokenABI from "./AETHToken.json";
 import MinerNodeABI from "./MinerNode.json";
 import VPNSessionABI from "./VPNSession.json";
 import ValidatorABI from "./Validator.json";
+import PremiumVPNABI from "./PremiumVPN.json";
 
 export const ABIS = {
   AETHToken: AETHTokenABI.abi,
   MinerNode: MinerNodeABI.abi,
   VPNSession: VPNSessionABI.abi,
   Validator: ValidatorABI.abi,
+  PremiumVPN: PremiumVPNABI.abi,
 };
