@@ -61,18 +61,18 @@ contract AETHTokenV2 is ERC20, ERC20Burnable, Ownable {
 
     /**
      * @dev Burn tokens to get VPN access
-     * @param minutes Number of minutes of VPN access
+     * @param durationMinutes Number of minutes of VPN access
      */
-    function burnForAccess(uint256 minutes) external {
-        require(minutes > 0, "Minutes must be > 0");
-        uint256 burnAmount = minutes * burnRatePerMinute;
+    function burnForAccess(uint256 durationMinutes) external {
+        require(durationMinutes > 0, "Minutes must be > 0");
+        uint256 burnAmount = durationMinutes * burnRatePerMinute;
         require(balanceOf(msg.sender) >= burnAmount, "Insufficient balance");
         
         _burn(msg.sender, burnAmount);
         totalBurned[msg.sender] += burnAmount;
         totalBurnedGlobal += burnAmount;
         
-        emit BurnedForAccess(msg.sender, burnAmount, minutes);
+        emit BurnedForAccess(msg.sender, burnAmount, durationMinutes);
     }
 
     /**
