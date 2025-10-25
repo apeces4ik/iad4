@@ -137,6 +137,16 @@ async def get_referral_stats(address: str):
     """Get referral statistics"""
     try:
         stats = blockchain_client.get_referral_stats(address)
+        if not stats:
+            stats = {
+                "totalReferrals": 0,
+                "level1Count": 0,
+                "level2Count": 0,
+                "level3Count": 0,
+                "totalCommissions": 0.0,
+                "rank": 0,
+                "networkVolume": 0.0
+            }
         referrer = blockchain_client.get_referrer(address)
         return {
             "address": address,
