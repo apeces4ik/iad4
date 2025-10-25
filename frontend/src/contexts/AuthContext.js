@@ -42,14 +42,19 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const message = `Sign this message to authenticate with Aetherium Proxy.\n\nWallet: ${address}\nTimestamp: ${Date.now()}`;
+      
+      console.log("Requesting signature for message:", message);
       const signature = await signMessageAsync({ message });
+      console.log("Signature received:", signature);
 
+      console.log("Sending authentication request to:", `${API}/auth/connect-wallet`);
       const response = await axios.post(`${API}/auth/connect-wallet`, {
         wallet_address: address,
         signature,
         message,
       });
 
+      console.log("Authentication response:", response.data);
       const { token: authToken, user: userData } = response.data;
       setToken(authToken);
       setUser(userData);
@@ -58,8 +63,15 @@ export const AuthProvider = ({ children }) => {
       toast.success("Successfully authenticated!");
       return true;
     } catch (error) {
-      console.error("Authentication error:", error);
-      toast.error("Authentication failed");
+      console.error("Authentication error details:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        url: error.config?.url
+      });
+      
+      const errorMsg = error.response?.data?.detail || error.message || "Authentication failed";
+      toast.error(`Authentication failed: ${errorMsg}`);
       return false;
     }
   };
