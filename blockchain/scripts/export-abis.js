@@ -23,8 +23,11 @@ contracts.forEach((contractName) => {
 
   const artifact = JSON.parse(fs.readFileSync(artifactPath, "utf8"));
 
+  // Get contract address from deployment
+  const addressKey = `${contractName.replace(/([A-Z])/g, '_$1').toUpperCase().substring(1)}_ADDRESS`;
+  
   const output = {
-    address: deployment.contracts[contractName],
+    address: deployment.contracts[addressKey],
     abi: artifact.abi,
   };
 
