@@ -505,10 +505,6 @@ class BlockchainClient:
             "premiumVPN": self.premium_vpn_address,
             "rpcUrl": self.rpc_url
         }
-
-            "premiumVPN": self.premium_vpn_address,
-            "rpcUrl": self.rpc_url
-        }
     
     # NodeNFT Methods
     def get_user_nfts(self, address: str) -> list:
