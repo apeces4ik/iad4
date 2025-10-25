@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const contracts = ["AETHToken", "MinerNode", "VPNSession", "Validator", "PremiumVPN"];
+const contracts = ["AETHTokenV2", "MinerNodeV2", "NodeNFT", "ReferralProgram", "VPNSession", "Validator", "PremiumVPN"];
 const artifactsDir = path.join(__dirname, "../artifacts/contracts");
 const outputDir = path.join(__dirname, "../../frontend/src/contracts");
 
@@ -11,7 +11,7 @@ if (!fs.existsSync(outputDir)) {
 }
 
 // Read deployment info
-const deploymentPath = path.join(__dirname, "../deployments/localhost.json");
+const deploymentPath = path.join(__dirname, "../deployments/deployment-localhost.json");
 const deployment = JSON.parse(fs.readFileSync(deploymentPath, "utf8"));
 
 contracts.forEach((contractName) => {
