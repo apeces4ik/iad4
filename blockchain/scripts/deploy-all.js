@@ -12,19 +12,23 @@ async function main() {
   const deployments = {};
 
   try {
+    // Use deployer as fee collector for now
+    const feeCollector = deployer.address;
+
     // ==================== DEPLOY 1: AETHTokenV2 ====================
     console.log("📦 1/7 Deploying AETHTokenV2...");
     const AETHTokenV2 = await hre.ethers.getContractFactory("AETHTokenV2");
-    const aethToken = await AETHTokenV2.deploy();
+    const aethToken = await AETHTokenV2.deploy(feeCollector);
     await aethToken.deployed();
     deployments.AETH_TOKEN_V2_ADDRESS = aethToken.address;
     console.log("✅ AETHTokenV2 deployed to:", aethToken.address);
-    console.log("   Initial Supply: 1,000,000,000 AETH\n");
+    console.log("   Initial Supply: 1,000,000,000 AETH");
+    console.log("   Fee Collector:", feeCollector, "\n");
 
     // ==================== DEPLOY 2: MinerNodeV2 ====================
     console.log("📦 2/7 Deploying MinerNodeV2...");
     const MinerNodeV2 = await hre.ethers.getContractFactory("MinerNodeV2");
-    const minerNode = await MinerNodeV2.deploy(aethToken.address);
+    const minerNode = await MinerNodeV2.deploy(aethToken.address, feeCollector);
     await minerNode.deployed();
     deployments.MINER_NODE_V2_ADDRESS = minerNode.address;
     console.log("✅ MinerNodeV2 deployed to:", minerNode.address);
@@ -33,7 +37,7 @@ async function main() {
     // ==================== DEPLOY 3: NodeNFT ====================
     console.log("📦 3/7 Deploying NodeNFT...");
     const NodeNFT = await hre.ethers.getContractFactory("NodeNFT");
-    const nodeNFT = await NodeNFT.deploy(aethToken.address, minerNode.address);
+    const nodeNFT = await NodeNFT.deploy(feeCollector);
     await nodeNFT.deployed();
     deployments.NODE_NFT_ADDRESS = nodeNFT.address;
     console.log("✅ NodeNFT deployed to:", nodeNFT.address);
