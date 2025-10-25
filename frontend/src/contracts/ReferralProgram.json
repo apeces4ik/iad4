@@ -1,4 +1,5 @@
 {
+  "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
   "abi": [
     {
       "inputs": [
@@ -37,19 +38,19 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
-          "internalType": "address",
-          "name": "user",
-          "type": "address"
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "level",
+          "type": "uint256"
         },
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "amount",
+          "name": "newCommission",
           "type": "uint256"
         }
       ],
-      "name": "ConnectionBurned",
+      "name": "CommissionUpdated",
       "type": "event"
     },
     {
@@ -79,9 +80,15 @@
           "internalType": "address",
           "name": "user",
           "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "referrer",
+          "type": "address"
         }
       ],
-      "name": "PremiumExpired",
+      "name": "ReferralRegistered",
       "type": "event"
     },
     {
@@ -90,33 +97,14 @@
         {
           "indexed": true,
           "internalType": "address",
-          "name": "user",
+          "name": "referrer",
           "type": "address"
         },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "newExpiryTime",
-          "type": "uint256"
-        }
-      ],
-      "name": "PremiumRenewed",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
         {
           "indexed": true,
           "internalType": "address",
           "name": "user",
           "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "duration",
-          "type": "uint256"
         },
         {
           "indexed": false,
@@ -127,64 +115,38 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "expiryTime",
+          "name": "level",
           "type": "uint256"
         }
       ],
-      "name": "PremiumSubscribed",
+      "name": "ReferralRewardEarned",
       "type": "event"
     },
     {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "string",
-          "name": "priceType",
-          "type": "string"
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
         },
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "newPrice",
+          "name": "amount",
           "type": "uint256"
         }
       ],
-      "name": "PriceUpdated",
+      "name": "RewardsClaimed",
       "type": "event"
-    },
-    {
-      "inputs": [],
-      "name": "MONTH",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "YEAR",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
     },
     {
       "inputs": [],
       "name": "aethToken",
       "outputs": [
         {
-          "internalType": "contract IAETHToken",
+          "internalType": "contract IERC20",
           "name": "",
           "type": "address"
         }
@@ -193,16 +155,49 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "burnAmountPerConnection",
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "referrer",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "userSpending",
+          "type": "uint256"
+        }
+      ],
+      "name": "calculatePotentialEarnings",
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "",
+          "name": "level1Earnings",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "level2Earnings",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "level3Earnings",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalEarnings",
           "type": "uint256"
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "claimRewards",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -213,15 +208,78 @@
           "type": "address"
         }
       ],
-      "name": "burnOnConnect",
-      "outputs": [
+      "name": "deactivateReferrer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
         {
-          "internalType": "bool",
+          "internalType": "address",
           "name": "",
-          "type": "bool"
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
+      "name": "directReferrals",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "emergencyWithdraw",
+      "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "fundContract",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "getDirectReferrals",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -230,17 +288,27 @@
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "_totalBurnedGlobal",
+          "name": "_totalReferrals",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "_totalConnectionsGlobal",
+          "name": "_totalRewardsPaid",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "_totalPremiumUsers",
+          "name": "_level1Rate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_level2Rate",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_level3Rate",
           "type": "uint256"
         }
       ],
@@ -255,32 +323,81 @@
           "type": "address"
         }
       ],
-      "name": "getPremiumInfo",
+      "name": "getReferralChain",
       "outputs": [
+        {
+          "internalType": "address",
+          "name": "level1",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "level2",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "level3",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "getReferralInfo",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "referrer",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalReferred",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalEarned",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "pendingRewards",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "claimedRewards",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "level1Count",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "level2Count",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "level3Count",
+          "type": "uint256"
+        },
         {
           "internalType": "bool",
           "name": "isActive",
           "type": "bool"
-        },
-        {
-          "internalType": "uint256",
-          "name": "expiryTime",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "subscribedAt",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "totalConnections",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "daysRemaining",
-          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -290,45 +407,55 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "user",
+          "name": "",
           "type": "address"
         }
       ],
-      "name": "getUserStats",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "totalConnections",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "totalBurned",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "lastConnectionTime",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "user",
-          "type": "address"
-        }
-      ],
-      "name": "isPremium",
+      "name": "hasJoined",
       "outputs": [
         {
           "internalType": "bool",
           "name": "",
           "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "level1Commission",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "level2Commission",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "level3Commission",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -348,13 +475,80 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "premiumMonthlyPrice",
-      "outputs": [
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "reactivateReferrer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
         {
           "internalType": "uint256",
-          "name": "",
+          "name": "amount",
           "type": "uint256"
+        }
+      ],
+      "name": "recordPurchase",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "referralInfo",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "referrer",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalReferred",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalEarned",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "level1Referrals",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "level2Referrals",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "level3Referrals",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isActive",
+          "type": "bool"
         }
       ],
       "stateMutability": "view",
@@ -368,26 +562,21 @@
           "type": "address"
         }
       ],
-      "name": "premiumUsers",
+      "name": "referralStats",
       "outputs": [
         {
-          "internalType": "bool",
-          "name": "isActive",
-          "type": "bool"
-        },
-        {
           "internalType": "uint256",
-          "name": "expiryTime",
+          "name": "pendingRewards",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "subscribedAt",
+          "name": "claimedRewards",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "totalConnections",
+          "name": "totalVolume",
           "type": "uint256"
         }
       ],
@@ -395,16 +584,16 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "premiumYearlyPrice",
-      "outputs": [
+      "inputs": [
         {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "referrer",
+          "type": "address"
         }
       ],
-      "stateMutability": "view",
+      "name": "register",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -416,21 +605,7 @@
     },
     {
       "inputs": [],
-      "name": "subscribePremiumMonthly",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "subscribePremiumYearly",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalBurnedGlobal",
+      "name": "totalReferrals",
       "outputs": [
         {
           "internalType": "uint256",
@@ -443,20 +618,7 @@
     },
     {
       "inputs": [],
-      "name": "totalConnectionsGlobal",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalPremiumUsers",
+      "name": "totalRewardsPaid",
       "outputs": [
         {
           "internalType": "uint256",
@@ -484,84 +646,21 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "newAmount",
-          "type": "uint256"
-        }
-      ],
-      "name": "updateBurnAmount",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "newPrice",
-          "type": "uint256"
-        }
-      ],
-      "name": "updateMonthlyPrice",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "newPrice",
-          "type": "uint256"
-        }
-      ],
-      "name": "updateYearlyPrice",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "userStats",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "totalConnections",
+          "name": "_level1",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "totalBurned",
+          "name": "_level2",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "lastConnectionTime",
+          "name": "_level3",
           "type": "uint256"
         }
       ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "withdrawTreasury",
+      "name": "updateCommissions",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
