@@ -137,6 +137,8 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 async def connect_wallet(request: ConnectWalletRequest):
     """Connect wallet and authenticate user"""
     try:
+        logger.info(f"Authentication request received for wallet: {request.wallet_address}")
+        
         # Verify signature (simplified for MVP - in production use proper signature verification)
         wallet_address = request.wallet_address.lower()
         
