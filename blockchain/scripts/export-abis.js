@@ -38,28 +38,36 @@ contracts.forEach((contractName) => {
 });
 
 // Create index file with all addresses
-const indexContent = `// Contract addresses and ABIs
+const indexContent = `// Contract addresses and ABIs - V2
+// Auto-generated at: ${new Date().toISOString()}
+
 export const CONTRACTS = {
-  AETHToken: "${deployment.contracts.AETHToken}",
-  MinerNode: "${deployment.contracts.MinerNode}",
-  VPNSession: "${deployment.contracts.VPNSession}",
-  Validator: "${deployment.contracts.Validator}",
-  PremiumVPN: "${deployment.contracts.PremiumVPN}",
+  AETHTokenV2: "${deployment.contracts.AETH_TOKEN_V2_ADDRESS}",
+  MinerNodeV2: "${deployment.contracts.MINER_NODE_V2_ADDRESS}",
+  NodeNFT: "${deployment.contracts.NODE_NFT_ADDRESS}",
+  ReferralProgram: "${deployment.contracts.REFERRAL_PROGRAM_ADDRESS}",
+  VPNSession: "${deployment.contracts.VPN_SESSION_ADDRESS}",
+  Validator: "${deployment.contracts.VALIDATOR_ADDRESS}",
+  PremiumVPN: "${deployment.contracts.PREMIUM_VPN_ADDRESS}",
 };
 
-export const CHAIN_ID = ${deployment.chainId};
+export const CHAIN_ID = 31337; // Hardhat localhost
 export const RPC_URL = "http://127.0.0.1:8545";
 
 // Import ABIs
-import AETHTokenABI from "./AETHToken.json";
-import MinerNodeABI from "./MinerNode.json";
+import AETHTokenV2ABI from "./AETHTokenV2.json";
+import MinerNodeV2ABI from "./MinerNodeV2.json";
+import NodeNFTABI from "./NodeNFT.json";
+import ReferralProgramABI from "./ReferralProgram.json";
 import VPNSessionABI from "./VPNSession.json";
 import ValidatorABI from "./Validator.json";
 import PremiumVPNABI from "./PremiumVPN.json";
 
 export const ABIS = {
-  AETHToken: AETHTokenABI.abi,
-  MinerNode: MinerNodeABI.abi,
+  AETHTokenV2: AETHTokenV2ABI.abi,
+  MinerNodeV2: MinerNodeV2ABI.abi,
+  NodeNFT: NodeNFTABI.abi,
+  ReferralProgram: ReferralProgramABI.abi,
   VPNSession: VPNSessionABI.abi,
   Validator: ValidatorABI.abi,
   PremiumVPN: PremiumVPNABI.abi,
