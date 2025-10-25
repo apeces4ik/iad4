@@ -102,3 +102,7 @@ watchfiles==1.1.1
 web3==6.15.1
 websockets==15.0.1
 yarl==1.22.0
+redis==5.0.1
+aioredis==2.0.1
+slowapi==0.1.9
+limits==3.8.0
