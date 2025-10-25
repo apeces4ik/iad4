@@ -123,8 +123,6 @@ async function main() {
   console.log("====================\n");
 }
 
-export default main;
-
 main()
   .then(() => process.exit(0))
   .catch((error) => {
