@@ -312,12 +312,154 @@ class BlockchainClient:
     def get_contract_addresses(self) -> dict:
         """Get all contract addresses"""
         return {
-            "aethToken": self.aeth_token_address,
-            "minerNode": self.miner_node_address,
+            "aethTokenV2": self.aeth_token_v2_address,
+            "minerNodeV2": self.miner_node_v2_address,
+            "nodeNFT": self.node_nft_address,
+            "referralProgram": self.referral_program_address,
             "vpnSession": self.vpn_session_address,
             "validator": self.validator_address,
+            "premiumVPN": self.premium_vpn_address,
             "rpcUrl": self.rpc_url
         }
+    
+    # NodeNFT Methods
+    def get_user_nfts(self, address: str) -> list:
+        """Get all NFTs owned by an address"""
+        if not self.node_nft:
+            return []
+        try:
+            balance = self.node_nft.functions.balanceOf(
+                self.w3.to_checksum_address(address)
+            ).call()
+            
+            nfts = []
+            for i in range(balance):
+                token_id = self.node_nft.functions.tokenOfOwnerByIndex(
+                    self.w3.to_checksum_address(address),
+                    i
+                ).call()
+                
+                # Get NFT details
+                nft_info = self.get_nft_info(token_id)
+                if nft_info:
+                    nfts.append(nft_info)
+            
+            return nfts
+        except Exception as e:
+            print(f"Error getting user NFTs: {e}")
+            return []
+    
+    def get_nft_info(self, token_id: int) -> dict:
+        """Get NFT information"""
+        if not self.node_nft:
+            return None
+        try:
+            nft_data = self.node_nft.functions.tokenDetails(token_id).call()
+            return {
+                "tokenId": token_id,
+                "tier": nft_data[0],  # 0=Bronze, 1=Silver, 2=Gold, 3=Diamond, 4=Legendary
+                "multiplier": float(nft_data[1]) / 10,  # Convert from 1.1x stored as 11
+                "nodeId": f"0x{nft_data[2].hex()}",
+                "mintedAt": nft_data[3],
+                "isListed": nft_data[4],
+                "price": float(self.w3.from_wei(nft_data[5], 'ether'))
+            }
+        except Exception as e:
+            print(f"Error getting NFT info: {e}")
+            return None
+    
+    def get_nft_marketplace_listings(self) -> list:
+        """Get all NFTs listed for sale"""
+        if not self.node_nft:
+            return []
+        try:
+            # This would need to be implemented by scanning events
+            # For now, return empty list
+            return []
+        except Exception as e:
+            print(f"Error getting marketplace listings: {e}")
+            return []
+    
+    # ReferralProgram Methods
+    def get_referral_code(self, address: str) -> str:
+        """Get referral code for an address"""
+        if not self.referral_program:
+            return ""
+        try:
+            code = self.referral_program.functions.getReferralCode(
+                self.w3.to_checksum_address(address)
+            ).call()
+            return code
+        except Exception as e:
+            print(f"Error getting referral code: {e}")
+            return ""
+    
+    def get_referral_stats(self, address: str) -> dict:
+        """Get referral statistics for an address"""
+        if not self.referral_program:
+            return None
+        try:
+            stats = self.referral_program.functions.getReferralStats(
+                self.w3.to_checksum_address(address)
+            ).call()
+            return {
+                "totalReferrals": stats[0],
+                "level1Count": stats[1],
+                "level2Count": stats[2],
+                "level3Count": stats[3],
+                "totalCommissions": float(self.w3.from_wei(stats[4], 'ether')),
+                "rank": stats[5],  # 0=Associate, 1=Bronze, 2=Silver, 3=Gold, 4=Diamond
+                "networkVolume": float(self.w3.from_wei(stats[6], 'ether'))
+            }
+        except Exception as e:
+            print(f"Error getting referral stats: {e}")
+            return None
+    
+    def get_referrer(self, address: str) -> str:
+        """Get the referrer address for a user"""
+        if not self.referral_program:
+            return "0x0000000000000000000000000000000000000000"
+        try:
+            referrer = self.referral_program.functions.referrer(
+                self.w3.to_checksum_address(address)
+            ).call()
+            return referrer
+        except Exception as e:
+            print(f"Error getting referrer: {e}")
+            return "0x0000000000000000000000000000000000000000"
+    
+    # PremiumVPN Methods
+    def is_premium_member(self, address: str) -> bool:
+        """Check if address has premium membership"""
+        if not self.premium_vpn:
+            return False
+        try:
+            is_premium = self.premium_vpn.functions.isPremiumActive(
+                self.w3.to_checksum_address(address)
+            ).call()
+            return is_premium
+        except Exception as e:
+            print(f"Error checking premium status: {e}")
+            return False
+    
+    def get_premium_info(self, address: str) -> dict:
+        """Get premium membership information"""
+        if not self.premium_vpn:
+            return None
+        try:
+            info = self.premium_vpn.functions.getMembershipInfo(
+                self.w3.to_checksum_address(address)
+            ).call()
+            return {
+                "isActive": info[0],
+                "startTime": info[1],
+                "expiresAt": info[2],
+                "dataUsedGB": info[3],
+                "plan": info[4]  # 0=None, 1=Monthly, 2=Quarterly, 3=Yearly
+            }
+        except Exception as e:
+            print(f"Error getting premium info: {e}")
+            return None
 
 # Singleton instance
 blockchain_client = BlockchainClient()
