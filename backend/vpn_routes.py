@@ -10,11 +10,16 @@ import os
 from datetime import datetime
 from web3 import Web3
 import json
+from pathlib import Path
 
 # Import WireGuard manager
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from vpn.wireguard_manager import WireGuardManager
+
+# Import blockchain utilities
+from blockchain.wallet import get_backend_wallet
+from blockchain.web3_client import BlockchainClient
 
 logger = logging.getLogger(__name__)
 
