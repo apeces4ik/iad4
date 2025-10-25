@@ -161,10 +161,11 @@ async def connect_wallet(request: ConnectWalletRequest):
         # Generate JWT token
         token = create_jwt_token(wallet_address)
         
+        logger.info(f"Authentication successful for wallet: {wallet_address}")
         return ConnectWalletResponse(token=token, user=user)
     
     except Exception as e:
-        logger.error(f"Error connecting wallet: {e}")
+        logger.error(f"Error connecting wallet: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/auth/me", response_model=User)
