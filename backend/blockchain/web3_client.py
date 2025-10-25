@@ -119,10 +119,10 @@ class BlockchainClient:
     
     def get_stake_info(self, address: str) -> dict:
         """Get staking info for an address"""
-        if not self.aeth_token:
+        if not self.aeth_token_v2:
             return {"amount": 0.0, "startTime": 0, "pendingRewards": 0.0}
         try:
-            stake_info = self.aeth_token.functions.getStakeInfo(
+            stake_info = self.aeth_token_v2.functions.getStakeInfo(
                 self.w3.to_checksum_address(address)
             ).call()
             return {
@@ -137,12 +137,12 @@ class BlockchainClient:
     # Miner Node Methods
     def get_node_info(self, node_id: str) -> dict:
         """Get node information"""
-        if not self.miner_node:
+        if not self.miner_node_v2:
             return None
         try:
             # Convert node_id to bytes32
             node_id_bytes = bytes.fromhex(node_id.replace('0x', ''))
-            node_info = self.miner_node.functions.getNode(node_id_bytes).call()
+            node_info = self.miner_node_v2.functions.getNode(node_id_bytes).call()
             return {
                 "owner": node_info[0],
                 "location": node_info[1],
@@ -158,10 +158,10 @@ class BlockchainClient:
     
     def get_owner_nodes(self, address: str) -> list:
         """Get all nodes owned by an address"""
-        if not self.miner_node:
+        if not self.miner_node_v2:
             return []
         try:
-            node_ids = self.miner_node.functions.getOwnerNodes(
+            node_ids = self.miner_node_v2.functions.getOwnerNodes(
                 self.w3.to_checksum_address(address)
             ).call()
             return [f"0x{node_id.hex()}" for node_id in node_ids]
@@ -171,16 +171,16 @@ class BlockchainClient:
     
     def get_all_nodes(self) -> list:
         """Get all registered nodes"""
-        if not self.miner_node:
+        if not self.miner_node_v2:
             return []
         try:
             # Get total nodes count
-            total_nodes = self.miner_node.functions.getTotalNodes().call()
+            total_nodes = self.miner_node_v2.functions.getTotalNodes().call()
             
             # Get all node IDs
             all_nodes = []
             for i in range(total_nodes):
-                node_id = self.miner_node.functions.allNodeIds(i).call()
+                node_id = self.miner_node_v2.functions.allNodeIds(i).call()
                 node_id_hex = f"0x{node_id.hex()}"
                 node_info = self.get_node_info(node_id_hex)
                 if node_info:
@@ -202,7 +202,7 @@ class BlockchainClient:
         Returns:
             List of node info dicts sorted by reputation (highest first)
         """
-        if not self.miner_node:
+        if not self.miner_node_v2:
             return []
         try:
             all_nodes = self.get_all_nodes()
@@ -233,7 +233,7 @@ class BlockchainClient:
         Returns:
             Transaction hash
         """
-        if not self.miner_node:
+        if not self.miner_node_v2:
             raise Exception("MinerNode contract not initialized")
         
         try:
@@ -241,7 +241,7 @@ class BlockchainClient:
             node_id_bytes = bytes.fromhex(node_id_hex.replace('0x', ''))
             
             # Build contract function call
-            contract_function = self.miner_node.functions.recordDataShared(
+            contract_function = self.miner_node_v2.functions.recordDataShared(
                 node_id_bytes,
                 data_mb
             )
