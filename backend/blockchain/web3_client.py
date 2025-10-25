@@ -106,10 +106,10 @@ class BlockchainClient:
     # AETH Token Methods
     def get_aeth_balance(self, address: str) -> float:
         """Get AETH balance for an address"""
-        if not self.aeth_token:
+        if not self.aeth_token_v2:
             return 0.0
         try:
-            balance = self.aeth_token.functions.balanceOf(
+            balance = self.aeth_token_v2.functions.balanceOf(
                 self.w3.to_checksum_address(address)
             ).call()
             return float(self.w3.from_wei(balance, 'ether'))
