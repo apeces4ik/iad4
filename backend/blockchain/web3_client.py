@@ -142,6 +142,91 @@ class BlockchainClient:
             print(f"Error getting owner nodes: {e}")
             return []
     
+    def get_all_nodes(self) -> list:
+        """Get all registered nodes"""
+        if not self.miner_node:
+            return []
+        try:
+            # Get total nodes count
+            total_nodes = self.miner_node.functions.getTotalNodes().call()
+            
+            # Get all node IDs
+            all_nodes = []
+            for i in range(total_nodes):
+                node_id = self.miner_node.functions.allNodeIds(i).call()
+                node_id_hex = f"0x{node_id.hex()}"
+                node_info = self.get_node_info(node_id_hex)
+                if node_info:
+                    node_info['nodeId'] = node_id_hex
+                    all_nodes.append(node_info)
+            
+            return all_nodes
+        except Exception as e:
+            print(f"Error getting all nodes: {e}")
+            return []
+    
+    def get_active_nodes_by_reputation(self, min_reputation: int = 50) -> list:
+        """
+        Get active nodes filtered by minimum reputation, sorted by reputation descending
+        
+        Args:
+            min_reputation: Minimum reputation score (0-100)
+            
+        Returns:
+            List of node info dicts sorted by reputation (highest first)
+        """
+        if not self.miner_node:
+            return []
+        try:
+            all_nodes = self.get_all_nodes()
+            
+            # Filter active nodes with reputation >= min_reputation
+            active_nodes = [
+                node for node in all_nodes
+                if node.get('isActive', False) and node.get('reputation', 0) >= min_reputation
+            ]
+            
+            # Sort by reputation descending
+            active_nodes.sort(key=lambda x: x.get('reputation', 0), reverse=True)
+            
+            return active_nodes
+        except Exception as e:
+            print(f"Error getting nodes by reputation: {e}")
+            return []
+    
+    def record_data_shared(self, backend_wallet, node_id_hex: str, data_mb: int) -> str:
+        """
+        Record data shared by a node and distribute rewards (owner only)
+        
+        Args:
+            backend_wallet: BackendWallet instance for signing transaction
+            node_id_hex: Node ID in hex format (0x...)
+            data_mb: Data shared in megabytes
+            
+        Returns:
+            Transaction hash
+        """
+        if not self.miner_node:
+            raise Exception("MinerNode contract not initialized")
+        
+        try:
+            # Convert node_id to bytes32
+            node_id_bytes = bytes.fromhex(node_id_hex.replace('0x', ''))
+            
+            # Build contract function call
+            contract_function = self.miner_node.functions.recordDataShared(
+                node_id_bytes,
+                data_mb
+            )
+            
+            # Send transaction using backend wallet
+            tx_hash = backend_wallet.send_transaction(contract_function)
+            
+            return tx_hash
+        except Exception as e:
+            print(f"Error recording data shared: {e}")
+            raise
+    
     # VPN Session Methods
     def get_session_info(self, session_id: str) -> dict:
         """Get session information"""
