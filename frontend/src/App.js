@@ -69,6 +69,10 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/design-system"
+        element={<DesignSystemShowcase />}
+      />
     </Routes>
   );
 }
