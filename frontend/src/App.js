@@ -9,6 +9,7 @@ import VPNConnect from "./pages/VPNConnect";
 import NodeManagement from "./pages/NodeManagement";
 import Staking from "./pages/Staking";
 import PremiumPage from "./pages/PremiumPage";
+import DesignSystemShowcase from "./pages/DesignSystemShowcase";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import "@/App.css";
 
