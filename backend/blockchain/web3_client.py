@@ -318,6 +318,8 @@ class BlockchainClient:
             "referralProgram": self.referral_program_address,
             "vpnSession": self.vpn_session_address,
             "validator": self.validator_address,
+            "rpcUrl": self.rpc_url
+        }
     
     # NodeNFT Methods
     def get_user_nfts(self, address: str) -> list:
