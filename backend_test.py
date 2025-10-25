@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Aetherium VPN - Blockchain Integration
-Tests all blockchain endpoints and existing API routes
+Comprehensive Backend Testing for Aetherium VPN - строки 300-400 файла "ЦЕЛЬ"
+Tests all backend endpoints: Core API, Blockchain Integration, VPN Manager, Node Management
 """
 
 import requests
@@ -16,9 +16,9 @@ API_BASE = f"{BACKEND_URL}/api"
 
 # Test addresses from Hardhat (first few accounts)
 TEST_ADDRESSES = [
-    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",  # Account 0
-    "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",  # Account 1
-    "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",  # Account 2
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",  # Deployer - has 1B AETH
+    "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",  # Test Account 1
+    "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",  # Test Account 2
 ]
 
 # Expected contract addresses (V2)
