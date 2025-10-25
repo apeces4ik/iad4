@@ -231,6 +231,17 @@ const Dashboard = () => {
                   </Card>
                 </div>
               </div>
+
+              {/* Earnings Chart - Day 50-52: Dashboard Page */}
+              <EarningsChart />
+
+              <div className="dashboard-grid-2col">
+                {/* Transaction History - Day 50-52: Dashboard Page */}
+                <TransactionHistory walletAddress={walletAddress} />
+                
+                {/* Referral Widget - Day 50-52: Dashboard Page */}
+                <ReferralWidget walletAddress={walletAddress} token={token} />
+              </div>
             </>
           )}
         </div>
