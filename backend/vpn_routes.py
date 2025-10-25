@@ -614,48 +614,37 @@ async def get_locations():
 async def get_best_nodes(location: str = "us-east", limit: int = 3):
     """
     Get best performing nodes for a location (for Premium users)
-    Sorted by reputation, bandwidth, and uptime
+    Sorted by reputation, bandwidth, and uptime from blockchain
     """
     try:
-        # For MVP, return simulated premium nodes
-        # In production, query MinerNode contract and sort by reputation
+        # Get premium nodes from blockchain (reputation > 90)
+        premium_nodes = blockchain_client.get_active_nodes_by_reputation(min_reputation=90)
         
-        premium_nodes = [
-            {
-                "node_id": 1,
-                "location": location,
-                "reputation": 98,
-                "bandwidth_mbps": 1000,
-                "uptime_percent": 99.9,
-                "total_data_shared_gb": 5420,
+        # Filter by location if specified
+        if location and location != "all":
+            premium_nodes = [
+                node for node in premium_nodes
+                if node.get('location', '').lower() == location.lower()
+            ]
+        
+        # Format nodes for response
+        formatted_nodes = []
+        for node in premium_nodes[:limit]:
+            formatted_nodes.append({
+                "node_id": node['nodeId'],
+                "location": node.get('location', 'unknown'),
+                "reputation": node.get('reputation', 0),
+                "bandwidth_mbps": node.get('bandwidthMbps', 0),
+                "uptime_percent": 99.0 + (node.get('reputation', 0) / 10),  # Estimate from reputation
+                "total_data_shared_gb": node.get('totalDataShared', 0) / 1000,  # MB to GB
                 "is_premium_tier": True,
-                "earnings": 128.5
-            },
-            {
-                "node_id": 2,
-                "location": location,
-                "reputation": 96,
-                "bandwidth_mbps": 950,
-                "uptime_percent": 99.5,
-                "total_data_shared_gb": 4280,
-                "is_premium_tier": True,
-                "earnings": 102.3
-            },
-            {
-                "node_id": 3,
-                "location": location,
-                "reputation": 94,
-                "bandwidth_mbps": 900,
-                "uptime_percent": 98.8,
-                "total_data_shared_gb": 3650,
-                "is_premium_tier": True,
-                "earnings": 89.7
-            }
-        ]
+                "earnings": node.get('totalEarnings', 0),
+                "owner": node.get('owner', 'unknown')
+            })
         
         return {
             "location": location,
-            "nodes": premium_nodes[:limit],
+            "nodes": formatted_nodes,
             "total_premium_nodes": len(premium_nodes)
         }
         
