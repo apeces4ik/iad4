@@ -109,9 +109,9 @@ def test_blockchain_status(results):
                 results.add_fail("Blockchain Connection", "Not connected to blockchain")
                 return
             
-            # Check contracts
+            # Check contracts (V2 format)
             contracts = data.get("contracts", {})
-            for contract_name, expected_addr in EXPECTED_CONTRACTS.items():
+            for contract_name, expected_addr in EXPECTED_CONTRACTS_V2.items():
                 actual_addr = contracts.get(contract_name)
                 if actual_addr == expected_addr:
                     results.add_pass(f"Contract Address - {contract_name}", f"Correct: {actual_addr}")
