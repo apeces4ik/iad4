@@ -22,35 +22,55 @@ class BlockchainClient:
         self.rpc_url = os.environ.get("BLOCKCHAIN_RPC_URL", "http://127.0.0.1:8545")
         self.w3 = Web3(Web3.HTTPProvider(self.rpc_url))
         
-        # Contract addresses
-        self.aeth_token_address = os.environ.get("AETH_TOKEN_ADDRESS")
-        self.miner_node_address = os.environ.get("MINER_NODE_ADDRESS")
+        # Contract addresses (V2)
+        self.aeth_token_v2_address = os.environ.get("AETH_TOKEN_V2_ADDRESS")
+        self.miner_node_v2_address = os.environ.get("MINER_NODE_V2_ADDRESS")
+        self.node_nft_address = os.environ.get("NODE_NFT_ADDRESS")
+        self.referral_program_address = os.environ.get("REFERRAL_PROGRAM_ADDRESS")
         self.vpn_session_address = os.environ.get("VPN_SESSION_ADDRESS")
         self.validator_address = os.environ.get("VALIDATOR_ADDRESS")
+        self.premium_vpn_address = os.environ.get("PREMIUM_VPN_ADDRESS")
         
         # Initialize contracts
-        self.aeth_token = None
-        self.miner_node = None
+        self.aeth_token_v2 = None
+        self.miner_node_v2 = None
+        self.node_nft = None
+        self.referral_program = None
         self.vpn_session = None
         self.validator = None
+        self.premium_vpn = None
         
         self._init_contracts()
     
     def _init_contracts(self):
         """Initialize contract instances"""
         try:
-            if self.aeth_token_address:
-                aeth_abi = load_abi("AETHToken")
-                self.aeth_token = self.w3.eth.contract(
-                    address=self.w3.to_checksum_address(self.aeth_token_address),
+            if self.aeth_token_v2_address:
+                aeth_abi = load_abi("AETHTokenV2")
+                self.aeth_token_v2 = self.w3.eth.contract(
+                    address=self.w3.to_checksum_address(self.aeth_token_v2_address),
                     abi=aeth_abi
                 )
             
-            if self.miner_node_address:
-                miner_abi = load_abi("MinerNode")
-                self.miner_node = self.w3.eth.contract(
-                    address=self.w3.to_checksum_address(self.miner_node_address),
+            if self.miner_node_v2_address:
+                miner_abi = load_abi("MinerNodeV2")
+                self.miner_node_v2 = self.w3.eth.contract(
+                    address=self.w3.to_checksum_address(self.miner_node_v2_address),
                     abi=miner_abi
+                )
+            
+            if self.node_nft_address:
+                nft_abi = load_abi("NodeNFT")
+                self.node_nft = self.w3.eth.contract(
+                    address=self.w3.to_checksum_address(self.node_nft_address),
+                    abi=nft_abi
+                )
+            
+            if self.referral_program_address:
+                referral_abi = load_abi("ReferralProgram")
+                self.referral_program = self.w3.eth.contract(
+                    address=self.w3.to_checksum_address(self.referral_program_address),
+                    abi=referral_abi
                 )
             
             if self.vpn_session_address:
@@ -65,6 +85,13 @@ class BlockchainClient:
                 self.validator = self.w3.eth.contract(
                     address=self.w3.to_checksum_address(self.validator_address),
                     abi=validator_abi
+                )
+            
+            if self.premium_vpn_address:
+                premium_abi = load_abi("PremiumVPN")
+                self.premium_vpn = self.w3.eth.contract(
+                    address=self.w3.to_checksum_address(self.premium_vpn_address),
+                    abi=premium_abi
                 )
         except Exception as e:
             print(f"Warning: Could not initialize contracts: {e}")
