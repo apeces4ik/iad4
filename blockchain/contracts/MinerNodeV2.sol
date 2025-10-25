@@ -285,7 +285,7 @@ contract MinerNodeV2 is Ownable {
     }
     
     /**
-     * @dev Get node info
+     * @dev Get node basic info
      */
     function getNodeInfo(bytes32 nodeId) external view returns (
         address owner,
@@ -293,12 +293,7 @@ contract MinerNodeV2 is Ownable {
         uint256 bandwidthMbps,
         bool isActive,
         uint256 totalDataShared,
-        uint256 totalEarnings,
-        uint256 reputation,
-        uint256 level,
-        uint256 experiencePoints,
-        uint256 uptimePercent,
-        uint256 stake
+        uint256 totalEarnings
     ) {
         Node memory node = nodes[nodeId];
         return (
@@ -307,7 +302,22 @@ contract MinerNodeV2 is Ownable {
             node.bandwidthMbps,
             node.isActive,
             node.totalDataShared,
-            node.totalEarnings,
+            node.totalEarnings
+        );
+    }
+    
+    /**
+     * @dev Get node advanced stats
+     */
+    function getNodeStats(bytes32 nodeId) external view returns (
+        uint256 reputation,
+        uint256 level,
+        uint256 experiencePoints,
+        uint256 uptimePercent,
+        uint256 stake
+    ) {
+        Node memory node = nodes[nodeId];
+        return (
             node.reputation,
             node.level,
             node.experiencePoints,
