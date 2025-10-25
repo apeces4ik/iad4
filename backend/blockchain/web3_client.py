@@ -318,6 +318,192 @@ class BlockchainClient:
             "referralProgram": self.referral_program_address,
             "vpnSession": self.vpn_session_address,
             "validator": self.validator_address,
+    
+    # NodeNFT Methods
+    def get_user_nfts(self, address: str) -> list:
+        """Get all NFTs owned by an address"""
+        if not self.node_nft:
+            return []
+        try:
+            balance = self.node_nft.functions.balanceOf(
+                self.w3.to_checksum_address(address)
+            ).call()
+            
+            nfts = []
+            for i in range(balance):
+                try:
+                    token_id = self.node_nft.functions.tokenOfOwnerByIndex(
+                        self.w3.to_checksum_address(address),
+                        i
+                    ).call()
+                    
+                    # Get NFT details
+                    nft_info = self.get_nft_info(token_id)
+                    if nft_info:
+                        nfts.append(nft_info)
+                except:
+                    continue
+            
+            return nfts
+        except Exception as e:
+            print(f"Error getting user NFTs: {e}")
+            return []
+    
+    def get_nft_info(self, token_id: int) -> dict:
+        """Get NFT information"""
+        if not self.node_nft:
+            return None
+        try:
+            # Get basic NFT data
+            owner = self.node_nft.functions.ownerOf(token_id).call()
+            
+            # Try to get token details if contract has this function
+            try:
+                nft_data = self.node_nft.functions.tokenDetails(token_id).call()
+                return {
+                    "tokenId": token_id,
+                    "owner": owner,
+                    "tier": nft_data[0],  # 0=Bronze, 1=Silver, 2=Gold, 3=Diamond, 4=Legendary
+                    "multiplier": float(nft_data[1]) / 10,  # Convert from stored value
+                    "nodeId": f"0x{nft_data[2].hex()}" if len(nft_data) > 2 else "0x0",
+                    "mintedAt": nft_data[3] if len(nft_data) > 3 else 0,
+                    "isListed": nft_data[4] if len(nft_data) > 4 else False,
+                    "price": float(self.w3.from_wei(nft_data[5], 'ether')) if len(nft_data) > 5 else 0.0
+                }
+            except:
+                # Fallback if tokenDetails doesn't exist
+                return {
+                    "tokenId": token_id,
+                    "owner": owner,
+                    "tier": 0,
+                    "multiplier": 1.0
+                }
+        except Exception as e:
+            print(f"Error getting NFT info: {e}")
+            return None
+    
+    # ReferralProgram Methods
+    def get_referral_code(self, address: str) -> str:
+        """Get referral code for an address"""
+        if not self.referral_program:
+            return ""
+        try:
+            code = self.referral_program.functions.getReferralCode(
+                self.w3.to_checksum_address(address)
+            ).call()
+            return code
+        except Exception as e:
+            print(f"Error getting referral code: {e}")
+            return ""
+    
+    def get_referral_stats(self, address: str) -> dict:
+        """Get referral statistics for an address"""
+        if not self.referral_program:
+            return {
+                "totalReferrals": 0,
+                "level1Count": 0,
+                "level2Count": 0,
+                "level3Count": 0,
+                "totalCommissions": 0.0,
+                "rank": 0,
+                "networkVolume": 0.0
+            }
+        try:
+            stats = self.referral_program.functions.getReferralStats(
+                self.w3.to_checksum_address(address)
+            ).call()
+            return {
+                "totalReferrals": stats[0],
+                "level1Count": stats[1],
+                "level2Count": stats[2],
+                "level3Count": stats[3],
+                "totalCommissions": float(self.w3.from_wei(stats[4], 'ether')),
+                "rank": stats[5],  # 0=Associate, 1=Bronze, 2=Silver, 3=Gold, 4=Diamond
+                "networkVolume": float(self.w3.from_wei(stats[6], 'ether'))
+            }
+        except Exception as e:
+            print(f"Error getting referral stats: {e}")
+            return {
+                "totalReferrals": 0,
+                "level1Count": 0,
+                "level2Count": 0,
+                "level3Count": 0,
+                "totalCommissions": 0.0,
+                "rank": 0,
+                "networkVolume": 0.0
+            }
+    
+    def get_referrer(self, address: str) -> str:
+        """Get the referrer address for a user"""
+        if not self.referral_program:
+            return "0x0000000000000000000000000000000000000000"
+        try:
+            referrer = self.referral_program.functions.referrer(
+                self.w3.to_checksum_address(address)
+            ).call()
+            return referrer
+        except Exception as e:
+            print(f"Error getting referrer: {e}")
+            return "0x0000000000000000000000000000000000000000"
+    
+    # PremiumVPN Methods
+    def is_premium_member(self, address: str) -> bool:
+        """Check if address has premium membership"""
+        if not self.premium_vpn:
+            return False
+        try:
+            is_premium = self.premium_vpn.functions.isPremiumActive(
+                self.w3.to_checksum_address(address)
+            ).call()
+            return is_premium
+        except Exception as e:
+            print(f"Error checking premium status: {e}")
+            return False
+    
+    def get_premium_info(self, address: str) -> dict:
+        """Get premium membership information"""
+        if not self.premium_vpn:
+            return {
+                "isActive": False,
+                "startTime": 0,
+                "expiresAt": 0,
+                "dataUsedGB": 0,
+                "plan": 0
+            }
+        try:
+            info = self.premium_vpn.functions.getMembershipInfo(
+                self.w3.to_checksum_address(address)
+            ).call()
+            return {
+                "isActive": info[0],
+                "startTime": info[1],
+                "expiresAt": info[2],
+                "dataUsedGB": info[3],
+                "plan": info[4]  # 0=None, 1=Monthly, 2=Quarterly, 3=Yearly
+            }
+        except Exception as e:
+            print(f"Error getting premium info: {e}")
+            return {
+                "isActive": False,
+                "startTime": 0,
+                "expiresAt": 0,
+                "dataUsedGB": 0,
+                "plan": 0
+            }
+    
+    def get_all_contract_addresses(self) -> dict:
+        """Get all V2 contract addresses"""
+        return {
+            "aethTokenV2": self.aeth_token_v2_address,
+            "minerNodeV2": self.miner_node_v2_address,
+            "nodeNFT": self.node_nft_address,
+            "referralProgram": self.referral_program_address,
+            "vpnSession": self.vpn_session_address,
+            "validator": self.validator_address,
+            "premiumVPN": self.premium_vpn_address,
+            "rpcUrl": self.rpc_url
+        }
+
             "premiumVPN": self.premium_vpn_address,
             "rpcUrl": self.rpc_url
         }
