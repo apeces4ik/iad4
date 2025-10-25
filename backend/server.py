@@ -530,6 +530,22 @@ try:
 except Exception as e:
     logger.warning(f"VPN integration disabled: {e}")
 
+# VPN Manager integration (строки 340-356 файла "цель")
+try:
+    from vpn_manager_routes import router as vpn_manager_router
+    app.include_router(vpn_manager_router)
+    logger.info("VPN Manager integration enabled")
+except Exception as e:
+    logger.warning(f"VPN Manager disabled: {e}")
+
+# Node Management integration (строки 358-374 файла "цель")
+try:
+    from node_management_routes import router as node_mgmt_router
+    app.include_router(node_mgmt_router)
+    logger.info("Node Management integration enabled")
+except Exception as e:
+    logger.warning(f"Node Management disabled: {e}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
