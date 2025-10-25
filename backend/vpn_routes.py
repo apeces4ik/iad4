@@ -25,6 +25,17 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/vpn", tags=["VPN"])
 
+# Initialize blockchain client and backend wallet
+blockchain_client = BlockchainClient()
+backend_wallet = None
+
+try:
+    backend_wallet = get_backend_wallet()
+    logger.info(f"✅ Backend wallet initialized: {backend_wallet.get_address()}")
+    logger.info(f"✅ Backend wallet balance: {backend_wallet.get_balance()} ETH")
+except Exception as e:
+    logger.error(f"❌ Failed to initialize backend wallet: {e}")
+
 # Initialize Web3
 BLOCKCHAIN_RPC_URL = os.environ.get('BLOCKCHAIN_RPC_URL', 'http://127.0.0.1:8545')
 w3 = Web3(Web3.HTTPProvider(BLOCKCHAIN_RPC_URL))
