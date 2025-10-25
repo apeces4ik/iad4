@@ -11,7 +11,7 @@ from datetime import datetime
 import time
 
 # Configuration
-BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://nodeflow-2.preview.emergentagent.com')
+BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://node-network-1.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test addresses from Hardhat (first few accounts)
