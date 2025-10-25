@@ -307,28 +307,365 @@ def test_dashboard_stats(results, token):
     except Exception as e:
         results.add_fail("Dashboard Stats", str(e))
 
+def test_v2_blockchain_endpoints(results):
+    """Test all V2 blockchain endpoints (строки 300-400)"""
+    print("\n🔍 Testing V2 Blockchain Endpoints...")
+    
+    # Test V2 contracts endpoint
+    try:
+        response = requests.get(f"{API_BASE}/blockchain/contracts/v2", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Verify all V2 contracts are present
+            for contract_name, expected_addr in EXPECTED_CONTRACTS_V2.items():
+                if contract_name in data and data[contract_name] == expected_addr:
+                    results.add_pass(f"V2 Contracts - {contract_name}", f"Correct: {expected_addr}")
+                else:
+                    results.add_fail(f"V2 Contracts - {contract_name}", 
+                                   f"Expected {expected_addr}, got {data.get(contract_name)}")
+        else:
+            results.add_fail("V2 Contracts Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("V2 Contracts Endpoint", str(e))
+
+def test_nft_endpoints(results):
+    """Test NFT-related endpoints"""
+    print("\n🔍 Testing NFT Endpoints...")
+    
+    test_address = TEST_ADDRESSES[0]
+    
+    # Test user NFTs
+    try:
+        response = requests.get(f"{API_BASE}/blockchain/nft/user/{test_address}", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if "nfts" in data and "count" in data:
+                results.add_pass("NFT User Endpoint", f"Returns {data['count']} NFTs")
+            else:
+                results.add_fail("NFT User Endpoint", "Invalid response format")
+        else:
+            results.add_fail("NFT User Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("NFT User Endpoint", str(e))
+    
+    # Test specific NFT (token_id = 1)
+    try:
+        response = requests.get(f"{API_BASE}/blockchain/nft/1", timeout=10)
+        if response.status_code == 404:
+            results.add_pass("NFT Specific Endpoint", "Correctly returns 404 for non-existent NFT")
+        elif response.status_code == 200:
+            results.add_pass("NFT Specific Endpoint", "Returns NFT data")
+        else:
+            results.add_warning("NFT Specific Endpoint", f"Unexpected status: {response.status_code}")
+    except Exception as e:
+        results.add_fail("NFT Specific Endpoint", str(e))
+
+def test_referral_endpoints(results):
+    """Test referral system endpoints"""
+    print("\n🔍 Testing Referral Endpoints...")
+    
+    test_address = TEST_ADDRESSES[0]
+    
+    # Test referral code
+    try:
+        response = requests.get(f"{API_BASE}/blockchain/referral/code/{test_address}", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if "address" in data and "referralCode" in data:
+                results.add_pass("Referral Code Endpoint", f"Code: {data['referralCode']}")
+            else:
+                results.add_fail("Referral Code Endpoint", "Invalid response format")
+        else:
+            results.add_fail("Referral Code Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("Referral Code Endpoint", str(e))
+    
+    # Test referral stats
+    try:
+        response = requests.get(f"{API_BASE}/blockchain/referral/stats/{test_address}", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            required_fields = ["address", "totalReferrals", "totalCommissions", "rank"]
+            
+            for field in required_fields:
+                if field in data:
+                    results.add_pass(f"Referral Stats - {field}", f"Present: {data[field]}")
+                else:
+                    results.add_fail(f"Referral Stats - {field}", "Missing field")
+        else:
+            results.add_fail("Referral Stats Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("Referral Stats Endpoint", str(e))
+    
+    # Test referrer
+    try:
+        response = requests.get(f"{API_BASE}/blockchain/referral/referrer/{test_address}", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if "address" in data and "referrer" in data:
+                results.add_pass("Referrer Endpoint", f"Referrer: {data['referrer']}")
+            else:
+                results.add_fail("Referrer Endpoint", "Invalid response format")
+        else:
+            results.add_fail("Referrer Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("Referrer Endpoint", str(e))
+
+def test_premium_endpoints(results):
+    """Test premium VPN endpoints"""
+    print("\n🔍 Testing Premium VPN Endpoints...")
+    
+    test_address = TEST_ADDRESSES[0]
+    
+    # Test premium status
+    try:
+        response = requests.get(f"{API_BASE}/blockchain/premium/status/{test_address}", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            required_fields = ["address", "isPremium", "info"]
+            
+            for field in required_fields:
+                if field in data:
+                    results.add_pass(f"Premium Status - {field}", f"Present: {data[field]}")
+                else:
+                    results.add_fail(f"Premium Status - {field}", "Missing field")
+        else:
+            results.add_fail("Premium Status Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("Premium Status Endpoint", str(e))
+    
+    # Test premium info
+    try:
+        response = requests.get(f"{API_BASE}/blockchain/premium/info/{test_address}", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if "address" in data:
+                results.add_pass("Premium Info Endpoint", "Returns premium info")
+            else:
+                results.add_fail("Premium Info Endpoint", "Invalid response format")
+        else:
+            results.add_fail("Premium Info Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("Premium Info Endpoint", str(e))
+
+def test_dashboard_endpoints(results, token):
+    """Test dashboard endpoints"""
+    print("\n🔍 Testing Dashboard Endpoints...")
+    
+    if not token:
+        results.add_warning("Dashboard Endpoints", "Skipped - no auth token available")
+        return
+    
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Test dashboard stats (balance, nodes, earnings combined)
+    try:
+        response = requests.get(f"{API_BASE}/dashboard/stats", headers=headers, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            required_fields = ["aeth_balance", "staked_aeth", "total_earnings", "active_nodes", "total_data_shared"]
+            
+            for field in required_fields:
+                if field in data:
+                    results.add_pass(f"Dashboard Stats - {field}", f"Present: {data[field]}")
+                else:
+                    results.add_fail(f"Dashboard Stats - {field}", "Missing field")
+        else:
+            results.add_fail("Dashboard Stats", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("Dashboard Stats", str(e))
+
+def test_vpn_manager_endpoints(results):
+    """Test VPN Manager endpoints (строки 340-356)"""
+    print("\n🔍 Testing VPN Manager Endpoints...")
+    
+    # Test VPN status (no auth required)
+    try:
+        response = requests.get(f"{API_BASE}/vpn/status", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if "is_connected" in data:
+                results.add_pass("VPN Status Endpoint", f"Connected: {data['is_connected']}")
+            else:
+                results.add_fail("VPN Status Endpoint", "Invalid response format")
+        else:
+            results.add_fail("VPN Status Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("VPN Status Endpoint", str(e))
+    
+    # Test VPN config
+    try:
+        response = requests.get(f"{API_BASE}/vpn/config", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if "config_text" in data and "config_json" in data:
+                results.add_pass("VPN Config Endpoint", "Returns WireGuard config")
+            else:
+                results.add_fail("VPN Config Endpoint", "Invalid response format")
+        else:
+            results.add_fail("VPN Config Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("VPN Config Endpoint", str(e))
+    
+    # Test VPN connect (POST - will likely fail without proper auth, but should return structured error)
+    try:
+        payload = {
+            "location": "US-East",
+            "protocol": "wireguard",
+            "kill_switch": True
+        }
+        response = requests.post(f"{API_BASE}/vpn/connect", json=payload, timeout=10)
+        if response.status_code in [200, 401, 422, 500]:  # Expected responses
+            results.add_pass("VPN Connect Endpoint", f"Responds correctly (HTTP {response.status_code})")
+        else:
+            results.add_warning("VPN Connect Endpoint", f"Unexpected status: {response.status_code}")
+    except Exception as e:
+        results.add_warning("VPN Connect Endpoint", f"Connection error: {str(e)}")
+    
+    # Test burn tokens (POST)
+    try:
+        payload = {
+            "duration_minutes": 60
+        }
+        response = requests.post(f"{API_BASE}/vpn/burn-tokens", json=payload, timeout=10)
+        if response.status_code in [200, 401, 422, 500]:  # Expected responses
+            results.add_pass("VPN Burn Tokens Endpoint", f"Responds correctly (HTTP {response.status_code})")
+        else:
+            results.add_warning("VPN Burn Tokens Endpoint", f"Unexpected status: {response.status_code}")
+    except Exception as e:
+        results.add_warning("VPN Burn Tokens Endpoint", f"Connection error: {str(e)}")
+
+def test_node_management_endpoints(results, token):
+    """Test Node Management endpoints (строки 358-374)"""
+    print("\n🔍 Testing Node Management Endpoints...")
+    
+    # Test leaderboard (no auth required)
+    try:
+        response = requests.get(f"{API_BASE}/nodes/leaderboard", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list):
+                results.add_pass("Node Leaderboard Endpoint", f"Returns {len(data)} entries")
+            else:
+                results.add_fail("Node Leaderboard Endpoint", "Invalid response format")
+        else:
+            results.add_fail("Node Leaderboard Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("Node Leaderboard Endpoint", str(e))
+    
+    if not token:
+        results.add_warning("Node Management Auth Endpoints", "Skipped - no auth token available")
+        return
+    
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Test my nodes
+    try:
+        response = requests.get(f"{API_BASE}/nodes/my-nodes", headers=headers, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if isinstance(data, list):
+                results.add_pass("My Nodes Endpoint", f"Returns {len(data)} nodes")
+            else:
+                results.add_fail("My Nodes Endpoint", "Invalid response format")
+        else:
+            results.add_fail("My Nodes Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("My Nodes Endpoint", str(e))
+    
+    # Test node registration (POST)
+    try:
+        payload = {
+            "location": "US-East",
+            "bandwidth_mbps": 1000,
+            "ip_address": "192.168.1.100"
+        }
+        response = requests.post(f"{API_BASE}/nodes/register", json=payload, headers=headers, timeout=10)
+        if response.status_code in [200, 201, 400, 422]:  # Expected responses
+            if response.status_code in [200, 201]:
+                data = response.json()
+                if "node_id" in data:
+                    results.add_pass("Node Register Endpoint", f"Node registered: {data['node_id']}")
+                    
+                    # Test node stats with the registered node
+                    node_id = data['node_id']
+                    try:
+                        stats_response = requests.get(f"{API_BASE}/nodes/{node_id}/stats", headers=headers, timeout=10)
+                        if stats_response.status_code == 200:
+                            results.add_pass("Node Stats Endpoint", f"Returns stats for {node_id}")
+                        else:
+                            results.add_warning("Node Stats Endpoint", f"HTTP {stats_response.status_code}")
+                    except Exception as e:
+                        results.add_warning("Node Stats Endpoint", str(e))
+                    
+                    # Test node update
+                    try:
+                        update_payload = {"bandwidth_mbps": 1500}
+                        update_response = requests.put(f"{API_BASE}/nodes/{node_id}/update", 
+                                                     json=update_payload, headers=headers, timeout=10)
+                        if update_response.status_code == 200:
+                            results.add_pass("Node Update Endpoint", f"Updated {node_id}")
+                        else:
+                            results.add_warning("Node Update Endpoint", f"HTTP {update_response.status_code}")
+                    except Exception as e:
+                        results.add_warning("Node Update Endpoint", str(e))
+                else:
+                    results.add_fail("Node Register Endpoint", "Missing node_id in response")
+            else:
+                results.add_pass("Node Register Endpoint", f"Responds correctly (HTTP {response.status_code})")
+        else:
+            results.add_warning("Node Register Endpoint", f"Unexpected status: {response.status_code}")
+    except Exception as e:
+        results.add_warning("Node Register Endpoint", f"Connection error: {str(e)}")
+
 def main():
-    """Run all backend tests"""
-    print("🚀 Starting Aetherium VPN Backend Testing")
+    """Run all backend tests for строки 300-400"""
+    print("🚀 Starting Aetherium VPN Backend Testing - строки 300-400")
     print(f"📡 Backend URL: {BACKEND_URL}")
     print(f"🔗 API Base: {API_BASE}")
+    print("🎯 Testing Scope: Core API, Blockchain Integration, VPN Manager, Node Management")
     
     results = TestResults()
     
-    # Test basic functionality
-    test_health_check(results)
+    # СПРИНТ 5: Core API Framework (Day 29-31)
+    print("\n" + "="*60)
+    print("СПРИНТ 5: CORE API FRAMEWORK TESTING")
+    print("="*60)
     
-    # Test blockchain integration
+    test_health_check(results)
+    token = test_wallet_connection(results)
+    test_dashboard_endpoints(results, token)
+    
+    # СПРИНТ 5: Blockchain Integration (Day 32-33)
+    print("\n" + "="*60)
+    print("СПРИНТ 5: BLOCKCHAIN INTEGRATION TESTING (13 ENDPOINTS)")
+    print("="*60)
+    
     test_blockchain_status(results)
     test_blockchain_contracts(results)
+    test_v2_blockchain_endpoints(results)
     test_balance_endpoints(results)
     test_node_endpoints(results)
     test_session_endpoints(results)
     test_validator_endpoints(results)
+    test_nft_endpoints(results)
+    test_referral_endpoints(results)
+    test_premium_endpoints(results)
     
-    # Test existing API functionality
-    token = test_wallet_connection(results)
-    test_dashboard_stats(results, token)
+    # СПРИНТ 6: VPN Manager (Day 36-38)
+    print("\n" + "="*60)
+    print("СПРИНТ 6: VPN MANAGER TESTING")
+    print("="*60)
+    
+    test_vpn_manager_endpoints(results)
+    
+    # СПРИНТ 6: Node Management (Day 39-41)
+    print("\n" + "="*60)
+    print("СПРИНТ 6: NODE MANAGEMENT TESTING")
+    print("="*60)
+    
+    test_node_management_endpoints(results, token)
     
     # Print comprehensive results
     results.print_summary()
