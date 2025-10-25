@@ -97,3 +97,90 @@ async def get_validator(address: str):
 async def get_contracts():
     """Get all contract addresses"""
     return blockchain_client.get_contract_addresses()
+
+
+# NFT Endpoints
+@router.get("/nft/user/{address}")
+async def get_user_nfts(address: str):
+    """Get all NFTs owned by a user"""
+    try:
+        nfts = blockchain_client.get_user_nfts(address)
+        return {"nfts": nfts, "count": len(nfts)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/nft/{token_id}")
+async def get_nft(token_id: int):
+    """Get NFT information"""
+    try:
+        nft_info = blockchain_client.get_nft_info(token_id)
+        if not nft_info:
+            raise HTTPException(status_code=404, detail="NFT not found")
+        return nft_info
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Referral Endpoints
+@router.get("/referral/code/{address}")
+async def get_referral_code(address: str):
+    """Get referral code for an address"""
+    try:
+        code = blockchain_client.get_referral_code(address)
+        return {"address": address, "referralCode": code}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/referral/stats/{address}")
+async def get_referral_stats(address: str):
+    """Get referral statistics"""
+    try:
+        stats = blockchain_client.get_referral_stats(address)
+        referrer = blockchain_client.get_referrer(address)
+        return {
+            "address": address,
+            "referrer": referrer,
+            **stats
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/referral/referrer/{address}")
+async def get_referrer(address: str):
+    """Get the referrer for a user"""
+    try:
+        referrer = blockchain_client.get_referrer(address)
+        return {"address": address, "referrer": referrer}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Premium VPN Endpoints
+@router.get("/premium/status/{address}")
+async def get_premium_status(address: str):
+    """Check if address has premium membership"""
+    try:
+        is_premium = blockchain_client.is_premium_member(address)
+        info = blockchain_client.get_premium_info(address) if is_premium else None
+        return {
+            "address": address,
+            "isPremium": is_premium,
+            "info": info
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/premium/info/{address}")
+async def get_premium_info(address: str):
+    """Get premium membership information"""
+    try:
+        info = blockchain_client.get_premium_info(address)
+        return {"address": address, **info}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# V2 Contract Addresses
+@router.get("/contracts/v2")
+async def get_contracts_v2():
+    """Get all V2 contract addresses"""
+    return blockchain_client.get_all_contract_addresses()
