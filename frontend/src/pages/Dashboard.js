@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wifi, Network, Coins, TrendingUp, LogOut, Menu, X, Crown } from "lucide-react";
 import { toast } from "sonner";
+import EarningsChart from "@/components/dashboard/EarningsChart";
+import TransactionHistory from "@/components/dashboard/TransactionHistory";
+import ReferralWidget from "@/components/dashboard/ReferralWidget";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
