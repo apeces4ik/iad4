@@ -73,11 +73,7 @@ async function main() {
     // ==================== DEPLOY 7: PremiumVPN ====================
     console.log("📦 7/7 Deploying PremiumVPN...");
     const PremiumVPN = await hre.ethers.getContractFactory("PremiumVPN");
-    const premiumVPN = await PremiumVPN.deploy(
-      aethToken.address,
-      minerNode.address,
-      vpnSession.address
-    );
+    const premiumVPN = await PremiumVPN.deploy(aethToken.address);
     await premiumVPN.deployed();
     deployments.PREMIUM_VPN_ADDRESS = premiumVPN.address;
     console.log("✅ PremiumVPN deployed to:", premiumVPN.address);
