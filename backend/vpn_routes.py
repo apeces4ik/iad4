@@ -344,19 +344,39 @@ async def disconnect_vpn(request: VPNDisconnectRequest):
             session_info['node_rewards'] = rewards_aeth
             session_info['rewards_recorded_on_chain'] = False
             
-            # TODO: Record data shared on blockchain (MinerNode.recordDataShared)
-            # This would require:
-            # 1. Getting actual node ID from MinerNode contract
-            # 2. Backend wallet with owner privileges to call recordDataShared
-            # 3. Gas management for transactions
-            # For MVP, we track rewards in session file
-            
-            if node_id:
-                logger.info(f"Session {session_id}: Node #{node_id} earned {rewards_aeth:.4f} AETH for {total_mb:.2f} MB traffic")
+            # Record data shared on blockchain (MinerNode.recordDataShared)
+            if node_id and node_id != "fallback" and total_mb > 0:
+                try:
+                    if backend_wallet is None:
+                        logger.error("Backend wallet not initialized")
+                        session_info['note'] = f"Node {node_id} earned {rewards_aeth:.4f} AETH but rewards NOT recorded (backend wallet error)"
+                    else:
+                        logger.info(f"Recording {total_mb:.2f} MB on blockchain for node {node_id}")
+                        
+                        # Call recordDataShared on MinerNode contract
+                        tx_hash = blockchain_client.record_data_shared(
+                            backend_wallet=backend_wallet,
+                            node_id_hex=node_id,
+                            data_mb=int(total_mb)  # Convert to int for contract
+                        )
+                        
+                        session_info['rewards_recorded_on_chain'] = True
+                        session_info['blockchain_tx_hash'] = tx_hash
+                        session_info['note'] = f"✅ Node {node_id} earned {rewards_aeth:.4f} AETH - recorded on blockchain"
+                        
+                        logger.info(f"✅ Rewards recorded on blockchain: tx {tx_hash}")
                 
-                # In production: Call MinerNode.recordDataShared(nodeId, totalMB)
-                # This will mint AETH tokens to node owner automatically
-                session_info['note'] = f"Node #{node_id} will receive {rewards_aeth:.4f} AETH (pending on-chain recording)"
+                except Exception as e:
+                    logger.error(f"Failed to record rewards on blockchain: {e}")
+                    session_info['rewards_recorded_on_chain'] = False
+                    session_info['blockchain_error'] = str(e)
+                    session_info['note'] = f"⚠️ Node {node_id} earned {rewards_aeth:.4f} AETH but blockchain recording failed: {str(e)}"
+            else:
+                logger.info(f"Skipping blockchain recording: node_id={node_id}, total_mb={total_mb}")
+                if node_id == "fallback":
+                    session_info['note'] = "Fallback node - no blockchain recording"
+                elif total_mb == 0:
+                    session_info['note'] = "No data transferred - no rewards"
             
             # Save updated session
             with open(session_path, 'w') as f:
@@ -370,7 +390,9 @@ async def disconnect_vpn(request: VPNDisconnectRequest):
                     "mb_received": stats['mb_received'],
                     "total_mb": total_mb,
                     "node_rewards": rewards_aeth,
-                    "node_id": node_id
+                    "node_id": node_id,
+                    "rewards_recorded": session_info.get('rewards_recorded_on_chain', False),
+                    "blockchain_tx": session_info.get('blockchain_tx_hash', None)
                 }
             }
         else:
