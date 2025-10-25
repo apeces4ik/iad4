@@ -49,7 +49,7 @@ contract AETHTokenV2 is ERC20, ERC20Burnable, Ownable {
     event Staked(address indexed user, uint256 amount, uint8 tier, uint256 lockUntil);
     event Unstaked(address indexed user, uint256 amount);
     event RewardsClaimed(address indexed user, uint256 amount);
-    event BurnedForAccess(address indexed user, uint256 amount, uint256 minutes);
+    event BurnedForAccess(address indexed user, uint256 amount, uint256 durationMinutes);
     event VestingCreated(address indexed user, uint256 amount, uint256 duration);
     event VestingReleased(address indexed user, uint256 amount);
     event FeeCollected(address indexed from, address indexed to, uint256 amount);
