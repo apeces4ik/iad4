@@ -1,7 +1,7 @@
-require("@nomiclabs/hardhat-ethers");
+import "@nomiclabs/hardhat-ethers";
 
 /** @type import('hardhat/config').HardhatUserConfig */
-module.exports = {
+export default {
   solidity: "0.8.20",
   networks: {
     hardhat: {
