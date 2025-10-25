@@ -160,8 +160,8 @@ async def connect_vpn(request: VPNConnectRequest):
     
     Flow:
     1. Check if user is premium
-    2. If premium, select best nodes (reputation > 90)
-    3. If not premium, select standard nodes
+    2. If premium, select best nodes (reputation > 90) from blockchain
+    3. If not premium, select standard nodes (reputation > 50) from blockchain
     4. Generate session and track node assignment
     5. Return success
     """
@@ -183,26 +183,69 @@ async def connect_vpn(request: VPNConnectRequest):
             except Exception as e:
                 logger.error(f"Failed to check premium status: {e}")
         
-        # Select node based on premium status
+        # Select node based on premium status from REAL blockchain data
         selected_node = None
-        if is_premium:
-            # Premium users get best nodes (reputation > 90)
+        
+        try:
+            if is_premium:
+                # Premium users get best nodes (reputation > 90)
+                premium_nodes = blockchain_client.get_active_nodes_by_reputation(min_reputation=90)
+                
+                if premium_nodes:
+                    # Select first available premium node
+                    best_node = premium_nodes[0]
+                    selected_node = {
+                        "node_id": best_node['nodeId'],
+                        "reputation": best_node['reputation'],
+                        "bandwidth_mbps": best_node['bandwidthMbps'],
+                        "location": best_node['location'],
+                        "tier": "premium",
+                        "owner": best_node['owner']
+                    }
+                    logger.info(f"Premium user {wallet_address} assigned to premium node {selected_node['node_id']} (reputation: {selected_node['reputation']})")
+                else:
+                    logger.warning("No premium nodes available, falling back to standard nodes")
+                    is_premium = False  # Fallback to standard selection
+            
+            if not is_premium or selected_node is None:
+                # Standard users get regular nodes (reputation > 50)
+                standard_nodes = blockchain_client.get_active_nodes_by_reputation(min_reputation=50)
+                
+                if standard_nodes:
+                    # Select first available standard node
+                    std_node = standard_nodes[0]
+                    selected_node = {
+                        "node_id": std_node['nodeId'],
+                        "reputation": std_node['reputation'],
+                        "bandwidth_mbps": std_node['bandwidthMbps'],
+                        "location": std_node['location'],
+                        "tier": "standard",
+                        "owner": std_node['owner']
+                    }
+                    logger.info(f"Standard user {wallet_address} assigned to standard node {selected_node['node_id']} (reputation: {selected_node['reputation']})")
+                else:
+                    # No nodes available - use fallback
+                    selected_node = {
+                        "node_id": "fallback",
+                        "reputation": 60,
+                        "bandwidth_mbps": 100,
+                        "location": "default",
+                        "tier": "fallback",
+                        "owner": "system"
+                    }
+                    logger.warning("No blockchain nodes available, using fallback node")
+        
+        except Exception as e:
+            logger.error(f"Error selecting node from blockchain: {e}")
+            # Fallback node selection
             selected_node = {
-                "node_id": 1,
-                "reputation": 98,
-                "bandwidth_mbps": 1000,
-                "tier": "premium"
+                "node_id": "fallback",
+                "reputation": 60,
+                "bandwidth_mbps": 100,
+                "location": "default",
+                "tier": "fallback",
+                "owner": "system"
             }
-            logger.info(f"Premium user {wallet_address} assigned to premium node {selected_node['node_id']}")
-        else:
-            # Standard users get regular nodes
-            selected_node = {
-                "node_id": 5,
-                "reputation": 75,
-                "bandwidth_mbps": 500,
-                "tier": "standard"
-            }
-            logger.info(f"Standard user {wallet_address} assigned to standard node {selected_node['node_id']}")
         
         # For non-premium users, burn should be handled by frontend
         # calling PremiumVPN.burnOnConnect() before this endpoint
@@ -244,7 +287,7 @@ async def connect_vpn(request: VPNConnectRequest):
         
         message = "Connected to VPN successfully!"
         if is_premium:
-            message += f" (Premium - connected to premium node #{selected_node['node_id']})"
+            message += f" (Premium - connected to node with reputation {selected_node['reputation']})"
         else:
             message += f" (Standard - burned {burned_amount} AETH)"
         
