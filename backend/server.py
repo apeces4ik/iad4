@@ -506,6 +506,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Add Rate Limiting Middleware (строки 292-295 файла "цель")
+try:
+    from rate_limiter import RateLimitMiddleware
+    app.add_middleware(RateLimitMiddleware)
+    logger.info("Rate limiting middleware enabled")
+except Exception as e:
+    logger.warning(f"Rate limiting disabled: {e}")
+
 # Blockchain integration
 try:
     from blockchain.routes import router as blockchain_router
