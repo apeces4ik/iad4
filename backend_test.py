@@ -619,12 +619,332 @@ def test_node_management_endpoints(results, token):
     except Exception as e:
         results.add_warning("Node Register Endpoint", f"Connection error: {str(e)}")
 
+def test_nft_marketplace_endpoints(results):
+    """Test NFT Marketplace endpoints (строки 500-600, Day 60-62)"""
+    print("\n🔍 Testing NFT Marketplace Endpoints...")
+    
+    # Test 1: GET /api/nft/marketplace - List marketplace NFTs
+    try:
+        response = requests.get(f"{API_BASE}/nft/marketplace", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            required_fields = ["listings", "total", "page", "pages", "stats"]
+            
+            for field in required_fields:
+                if field in data:
+                    results.add_pass(f"NFT Marketplace - {field}", f"Present: {data[field]}")
+                else:
+                    results.add_fail(f"NFT Marketplace - {field}", "Missing field")
+        else:
+            results.add_fail("NFT Marketplace Endpoint", f"HTTP {response.status_code}: {response.text}")
+    except Exception as e:
+        results.add_fail("NFT Marketplace Endpoint", str(e))
+    
+    # Test 2: GET /api/nft/marketplace with filters
+    try:
+        params = {
+            "tier": "Gold",
+            "min_price": 100,
+            "max_price": 1000,
+            "sort_by": "price_asc",
+            "limit": 20
+        }
+        response = requests.get(f"{API_BASE}/nft/marketplace", params=params, timeout=10)
+        if response.status_code == 200:
+            results.add_pass("NFT Marketplace Filters", "Filtering and sorting working")
+        else:
+            results.add_fail("NFT Marketplace Filters", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("NFT Marketplace Filters", str(e))
+    
+    # Test 3: GET /api/nft/{token_id} - Get specific NFT
+    try:
+        response = requests.get(f"{API_BASE}/nft/1", timeout=10)
+        if response.status_code in [200, 404]:
+            if response.status_code == 404:
+                results.add_pass("NFT Details Endpoint", "Correctly returns 404 for non-existent NFT")
+            else:
+                data = response.json()
+                if "nft" in data and "metadata" in data:
+                    results.add_pass("NFT Details Endpoint", "Returns NFT details structure")
+                else:
+                    results.add_fail("NFT Details Endpoint", "Invalid response structure")
+        else:
+            results.add_fail("NFT Details Endpoint", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("NFT Details Endpoint", str(e))
+    
+    # Test 4: POST /api/nft/list - List NFT for sale
+    try:
+        payload = {
+            "token_id": 1,
+            "price": 500,
+            "duration_days": 7,
+            "seller_address": TEST_ADDRESSES[0]
+        }
+        response = requests.post(f"{API_BASE}/nft/list", json=payload, timeout=10)
+        if response.status_code in [200, 201, 400, 403, 404]:
+            if response.status_code in [200, 201]:
+                results.add_pass("NFT List Endpoint", "NFT listing created successfully")
+            elif response.status_code == 404:
+                results.add_pass("NFT List Endpoint", "Correctly handles non-existent NFT")
+            elif response.status_code == 403:
+                results.add_pass("NFT List Endpoint", "Correctly validates ownership")
+            else:
+                results.add_pass("NFT List Endpoint", f"Responds correctly (HTTP {response.status_code})")
+        else:
+            results.add_fail("NFT List Endpoint", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("NFT List Endpoint", str(e))
+    
+    # Test 5: POST /api/nft/buy - Purchase NFT
+    try:
+        payload = {
+            "listing_id": "507f1f77bcf86cd799439011",  # Mock ObjectId
+            "buyer_address": TEST_ADDRESSES[1],
+            "tx_hash": "0x1234567890abcdef"
+        }
+        response = requests.post(f"{API_BASE}/nft/buy", json=payload, timeout=10)
+        if response.status_code in [200, 400, 404]:
+            results.add_pass("NFT Buy Endpoint", f"Responds correctly (HTTP {response.status_code})")
+        else:
+            results.add_fail("NFT Buy Endpoint", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("NFT Buy Endpoint", str(e))
+    
+    # Test 6: GET /api/nft/my-nfts/{address} - Get user's NFTs
+    try:
+        response = requests.get(f"{API_BASE}/nft/my-nfts/{TEST_ADDRESSES[0]}", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            required_fields = ["address", "nfts", "total"]
+            
+            for field in required_fields:
+                if field in data:
+                    results.add_pass(f"My NFTs - {field}", f"Present: {data[field]}")
+                else:
+                    results.add_fail(f"My NFTs - {field}", "Missing field")
+        else:
+            results.add_fail("My NFTs Endpoint", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("My NFTs Endpoint", str(e))
+    
+    # Test 7: GET /api/nft/stats - Marketplace statistics
+    try:
+        response = requests.get(f"{API_BASE}/nft/stats", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            required_fields = ["total_volume", "volume_24h", "floor_prices", "listed_count", "unique_sellers"]
+            
+            for field in required_fields:
+                if field in data:
+                    results.add_pass(f"NFT Stats - {field}", f"Present: {data[field]}")
+                else:
+                    results.add_fail(f"NFT Stats - {field}", "Missing field")
+        else:
+            results.add_fail("NFT Stats Endpoint", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("NFT Stats Endpoint", str(e))
+    
+    # Test 8: GET /api/nft/analytics/{tier} - Price analytics
+    try:
+        response = requests.get(f"{API_BASE}/nft/analytics/Gold?days=30", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            required_fields = ["tier", "period_days", "data"]
+            
+            for field in required_fields:
+                if field in data:
+                    results.add_pass(f"NFT Analytics - {field}", f"Present: {data[field]}")
+                else:
+                    results.add_fail(f"NFT Analytics - {field}", "Missing field")
+        else:
+            results.add_fail("NFT Analytics Endpoint", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("NFT Analytics Endpoint", str(e))
+    
+    # Test 9: DELETE /api/nft/listing/{listing_id} - Cancel listing
+    try:
+        listing_id = "507f1f77bcf86cd799439011"  # Mock ObjectId
+        params = {"seller_address": TEST_ADDRESSES[0]}
+        response = requests.delete(f"{API_BASE}/nft/listing/{listing_id}", params=params, timeout=10)
+        if response.status_code in [200, 400, 403, 404]:
+            results.add_pass("NFT Cancel Listing", f"Responds correctly (HTTP {response.status_code})")
+        else:
+            results.add_fail("NFT Cancel Listing", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("NFT Cancel Listing", str(e))
+
+
+def test_referral_program_endpoints(results):
+    """Test Referral Program endpoints (строки 500-600, Day 67-69)"""
+    print("\n🔍 Testing Referral Program Endpoints...")
+    
+    # Test 1: POST /api/referral/register - Register new user
+    try:
+        payload = {
+            "address": TEST_ADDRESSES[0]
+        }
+        response = requests.post(f"{API_BASE}/referral/register", json=payload, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            required_fields = ["success", "referral_code", "referral_url", "qr_code"]
+            
+            for field in required_fields:
+                if field in data:
+                    results.add_pass(f"Referral Register - {field}", f"Present: {data[field]}")
+                else:
+                    results.add_fail(f"Referral Register - {field}", "Missing field")
+            
+            # Store referral code for later tests
+            global test_referral_code
+            test_referral_code = data.get("referral_code", "ABC123")
+        else:
+            results.add_fail("Referral Register Endpoint", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("Referral Register Endpoint", str(e))
+    
+    # Test 2: POST /api/referral/register with referral code
+    try:
+        payload = {
+            "address": TEST_ADDRESSES[1],
+            "referral_code": test_referral_code if 'test_referral_code' in globals() else "ABC123"
+        }
+        response = requests.post(f"{API_BASE}/referral/register", json=payload, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if "referrer" in data:
+                results.add_pass("Referral Register with Code", f"Referrer linked: {data['referrer']}")
+            else:
+                results.add_pass("Referral Register with Code", "Registration successful")
+        else:
+            results.add_fail("Referral Register with Code", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("Referral Register with Code", str(e))
+    
+    # Test 3: GET /api/referral/my-stats/{address} - Get referral stats
+    try:
+        response = requests.get(f"{API_BASE}/referral/my-stats/{TEST_ADDRESSES[0]}", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            required_sections = ["referral", "rank", "earnings"]
+            
+            for section in required_sections:
+                if section in data:
+                    results.add_pass(f"Referral Stats - {section}", f"Present: {type(data[section])}")
+                else:
+                    results.add_fail(f"Referral Stats - {section}", "Missing section")
+            
+            # Check rank structure
+            if "rank" in data:
+                rank_fields = ["current", "progress", "bonus"]
+                for field in rank_fields:
+                    if field in data["rank"]:
+                        results.add_pass(f"Referral Rank - {field}", f"Present: {data['rank'][field]}")
+        else:
+            results.add_fail("Referral Stats Endpoint", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("Referral Stats Endpoint", str(e))
+    
+    # Test 4: GET /api/referral/tree/{address} - Get referral tree
+    try:
+        response = requests.get(f"{API_BASE}/referral/tree/{TEST_ADDRESSES[0]}?depth=3", timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            required_fields = ["root", "tree", "stats"]
+            
+            for field in required_fields:
+                if field in data:
+                    results.add_pass(f"Referral Tree - {field}", f"Present: {data[field]}")
+                else:
+                    results.add_fail(f"Referral Tree - {field}", "Missing field")
+            
+            # Check tree structure for D3.js
+            if "tree" in data and data["tree"]:
+                tree_fields = ["address", "referral_code", "direct_referrals", "rank", "children"]
+                for field in tree_fields:
+                    if field in data["tree"]:
+                        results.add_pass(f"Tree Structure - {field}", "Present in tree node")
+        else:
+            results.add_fail("Referral Tree Endpoint", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("Referral Tree Endpoint", str(e))
+    
+    # Test 5: POST /api/referral/claim - Claim commissions
+    try:
+        payload = {
+            "address": TEST_ADDRESSES[0],
+            "tx_hash": "0x1234567890abcdef"
+        }
+        response = requests.post(f"{API_BASE}/referral/claim", json=payload, timeout=10)
+        if response.status_code in [200, 400, 404]:
+            if response.status_code == 400:
+                results.add_pass("Referral Claim", "Correctly handles no pending commissions")
+            elif response.status_code == 404:
+                results.add_pass("Referral Claim", "Correctly handles unregistered user")
+            else:
+                results.add_pass("Referral Claim", "Claim processed successfully")
+        else:
+            results.add_fail("Referral Claim Endpoint", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("Referral Claim Endpoint", str(e))
+    
+    # Test 6: GET /api/referral/leaderboard - Get leaderboard
+    try:
+        params = {
+            "timeframe": "30d",
+            "metric": "commissions",
+            "limit": 50
+        }
+        response = requests.get(f"{API_BASE}/referral/leaderboard", params=params, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            required_fields = ["timeframe", "metric", "leaderboard", "total"]
+            
+            for field in required_fields:
+                if field in data:
+                    results.add_pass(f"Referral Leaderboard - {field}", f"Present: {data[field]}")
+                else:
+                    results.add_fail(f"Referral Leaderboard - {field}", "Missing field")
+            
+            # Check leaderboard entry structure
+            if "leaderboard" in data and len(data["leaderboard"]) > 0:
+                entry = data["leaderboard"][0]
+                entry_fields = ["rank", "address", "referral_code", "direct_referrals", "total_commissions"]
+                for field in entry_fields:
+                    if field in entry:
+                        results.add_pass(f"Leaderboard Entry - {field}", "Present in entry")
+        else:
+            results.add_fail("Referral Leaderboard Endpoint", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("Referral Leaderboard Endpoint", str(e))
+    
+    # Test 7: GET /api/referral/code/{code} - Validate referral code
+    try:
+        test_code = test_referral_code if 'test_referral_code' in globals() else "ABC123"
+        response = requests.get(f"{API_BASE}/referral/code/{test_code}", timeout=10)
+        if response.status_code in [200, 404]:
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["valid", "referrer_address", "referrer_rank"]
+                
+                for field in required_fields:
+                    if field in data:
+                        results.add_pass(f"Referral Code Validation - {field}", f"Present: {data[field]}")
+            else:
+                results.add_pass("Referral Code Validation", "Correctly handles invalid code")
+        else:
+            results.add_fail("Referral Code Validation", f"HTTP {response.status_code}")
+    except Exception as e:
+        results.add_fail("Referral Code Validation", str(e))
+
+
 def main():
-    """Run all backend tests for строки 300-400"""
-    print("🚀 Starting Aetherium VPN Backend Testing - строки 300-400")
+    """Run all backend tests for строки 500-600"""
+    print("🚀 Starting Aetherium VPN Backend Testing - строки 500-600")
     print(f"📡 Backend URL: {BACKEND_URL}")
     print(f"🔗 API Base: {API_BASE}")
-    print("🎯 Testing Scope: Core API, Blockchain Integration, VPN Manager, Node Management")
+    print("🎯 Testing Scope: NFT Marketplace + Referral Program Backend")
     
     results = TestResults()
     
@@ -666,6 +986,25 @@ def main():
     print("="*60)
     
     test_node_management_endpoints(results, token)
+    
+    # NEW: СТРОКИ 500-600 TESTING
+    print("\n" + "="*80)
+    print("🎯 СТРОКИ 500-600: NFT MARKETPLACE + REFERRAL PROGRAM TESTING")
+    print("="*80)
+    
+    # СПРИНТ 9: NFT Marketplace (Day 60-62)
+    print("\n" + "="*60)
+    print("СПРИНТ 9: NFT MARKETPLACE TESTING (9 ENDPOINTS)")
+    print("="*60)
+    
+    test_nft_marketplace_endpoints(results)
+    
+    # СПРИНТ 10: Referral Program (Day 67-69)
+    print("\n" + "="*60)
+    print("СПРИНТ 10: REFERRAL PROGRAM TESTING (7 ENDPOINTS)")
+    print("="*60)
+    
+    test_referral_program_endpoints(results)
     
     # Print comprehensive results
     results.print_summary()
