@@ -92,6 +92,10 @@ function AppRoutes() {
         path="/design-system"
         element={<DesignSystemShowcase />}
       />
+      <Route
+        path="/transaction-modal-example"
+        element={<TransactionModalExample />}
+      />
     </Routes>
   );
 }
