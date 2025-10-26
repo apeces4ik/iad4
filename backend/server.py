@@ -546,6 +546,22 @@ try:
 except Exception as e:
     logger.warning(f"Node Management disabled: {e}")
 
+# NFT Marketplace integration (Day 60-62)
+try:
+    from nft_marketplace_routes import router as nft_marketplace_router
+    app.include_router(nft_marketplace_router)
+    logger.info("NFT Marketplace integration enabled")
+except Exception as e:
+    logger.warning(f"NFT Marketplace disabled: {e}")
+
+# Referral Program integration (Day 67-69)
+try:
+    from referral_routes import router as referral_router
+    app.include_router(referral_router)
+    logger.info("Referral Program integration enabled")
+except Exception as e:
+    logger.warning(f"Referral Program disabled: {e}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
