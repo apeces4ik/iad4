@@ -3459,7 +3459,7 @@ h1, h2, h3, h4 {
 }
 
 .burn-amount-card {
-  padding: 1.5rem;
+  padding: 1rem;
   background: rgba(239, 68, 68, 0.05);
   border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: 0.75rem;
@@ -3469,7 +3469,7 @@ h1, h2, h3, h4 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .burn-amount-label {
@@ -3478,13 +3478,14 @@ h1, h2, h3, h4 {
 }
 
 .burn-badge {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
 }
 
 .burn-amount-value {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .burn-amount-icon {
@@ -3492,13 +3493,13 @@ h1, h2, h3, h4 {
 }
 
 .burn-amount-number {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .burn-amount-symbol {
-  font-size: 1.25rem;
+  font-size: 1rem;
   color: var(--text-secondary);
 }
 
