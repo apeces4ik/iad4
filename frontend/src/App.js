@@ -99,6 +99,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/referral"
+        element={
+          <ProtectedRoute>
+            <ReferralDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/design-system"
         element={<DesignSystemShowcase />}
       />
