@@ -307,7 +307,10 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "NFT Marketplace Backend (Day 60-62)"
+    - "Referral Program Backend (Day 67-69)"
+    - "Referral Dashboard UI (Day 64-66)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
