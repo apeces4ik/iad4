@@ -43,6 +43,14 @@ function AppRoutes() {
         path="/vpn"
         element={
           <ProtectedRoute>
+            <VPNConnectEnhanced />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/vpn-old"
+        element={
+          <ProtectedRoute>
             <VPNConnect />
           </ProtectedRoute>
         }
@@ -57,6 +65,14 @@ function AppRoutes() {
       />
       <Route
         path="/staking"
+        element={
+          <ProtectedRoute>
+            <StakingEnhanced />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/staking-old"
         element={
           <ProtectedRoute>
             <Staking />
