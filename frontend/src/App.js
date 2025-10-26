@@ -90,6 +90,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/marketplace"
+        element={
+          <ProtectedRoute>
+            <NFTMarketplace />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/design-system"
         element={<DesignSystemShowcase />}
       />
