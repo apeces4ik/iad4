@@ -22,7 +22,7 @@ import {
   LoadingSpinner,
   Tooltip,
   Alert
-} from './DesignSystem';
+} from '../components/DesignSystem';
 
 export default function DesignSystemShowcase() {
   const [showModal, setShowModal] = useState(false);
