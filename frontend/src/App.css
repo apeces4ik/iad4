@@ -4663,3 +4663,267 @@ h1, h2, h3, h4 {
   }
 }
 
+
+/* ==========================================
+   TRANSACTION MODAL STYLES
+   Day 46-48: Wallet Integration
+   ========================================== */
+
+.transaction-modal {
+  background: rgba(26, 26, 36, 0.98) !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+              0 0 40px rgba(6, 182, 212, 0.2) !important;
+  border-radius: 16px;
+  max-width: 500px;
+}
+
+.transaction-modal * {
+  color: var(--text-primary) !important;
+}
+
+.transaction-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.status-icon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+}
+
+.status-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.transaction-details {
+  background: rgba(15, 15, 25, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(45, 45, 68, 0.3);
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.detail-value.mono {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+}
+
+.transaction-hash {
+  background: rgba(15, 15, 25, 0.8);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.hash-header {
+  margin-bottom: 0.5rem;
+}
+
+.hash-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.hash-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.hash-text {
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: var(--primary-cyan);
+  font-weight: 600;
+}
+
+.hash-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-cyan);
+}
+
+.icon-btn:hover {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: rgba(6, 182, 212, 0.5);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+.error-card {
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.error-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.error-icon {
+  color: #ef4444;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.error-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #ef4444;
+  margin-bottom: 0.25rem;
+}
+
+.error-message {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.transaction-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.transaction-tip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: var(--primary-cyan);
+  text-align: center;
+}
+
+.transaction-tip svg {
+  flex-shrink: 0;
+  color: var(--primary-cyan);
+}
+
+/* Animation for pending status */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.6);
+  }
+}
+
+.transaction-modal[data-status="pending"],
+.transaction-modal[data-status="confirming"] {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Success animation */
+@keyframes success-scale {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.transaction-modal[data-status="confirmed"] .status-icon-container svg {
+  animation: success-scale 0.5s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .transaction-modal {
+    max-width: 95vw;
+    margin: 1rem;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .detail-value {
+    text-align: left;
+  }
+  
+  .hash-value {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .hash-actions {
+    justify-content: center;
+  }
+  
+  .transaction-actions {
+    flex-direction: column;
+  }
+}
+
