@@ -156,6 +156,31 @@ backend:
         agent: "main"
         comment: "✅ BACKEND V2 INTEGRATION COMPLETE - Updated web3_client.py to support all 7 V2 contracts. Added new methods: get_user_nfts(), get_nft_info(), get_referral_code(), get_referral_stats(), get_referrer(), is_premium_member(), get_premium_info(). Updated blockchain routes.py with 13 endpoints total (6 existing + 7 new). All endpoints tested and working: /api/blockchain/contracts/v2, /api/blockchain/nft/user/{address}, /api/blockchain/referral/stats/{address}, /api/blockchain/premium/status/{address}. Deployer account has 1B AETH balance confirmed."
 
+  - task: "NFT Marketplace Backend (Day 60-62 - строки 534-548)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/nft_marketplace_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ NFT MARKETPLACE BACKEND COMPLETE - Created comprehensive marketplace API: (1) IPFS Service with NFT.Storage integration (upload metadata, images), (2) 9 API endpoints: GET /marketplace (with filters/sort), GET /{token_id} (details), POST /list (list NFT), POST /buy (purchase), GET /my-nfts, DELETE /listing (cancel), GET /stats (marketplace stats), GET /analytics (price trends), POST /commission/record. (3) Database collections: nft_listings, nft_transactions, price_analytics. (4) Features: 2.5% marketplace fee, listing expiration, price analytics, transaction history. ТРЕБУЕТСЯ: Backend testing всех NFT endpoints."
+
+  - task: "Referral Program Backend (Day 67-69 - строки 584-598)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/referral_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "✅ REFERRAL PROGRAM BACKEND COMPLETE - Created full 3-level MLM system: (1) 8 API endpoints: POST /register (with QR code generation), GET /my-stats (earnings, rank, progress), GET /tree (3-level visualization data), POST /claim (claim commissions), GET /leaderboard (top 100), POST /commission/record (distribute 5%+3%+2%), GET /code/{code} (validate). (2) 5 Ranks: Bronze, Silver, Gold, Platinum, Diamond with progression requirements. (3) Database collections: referrals, referral_commissions, referral_claims. (4) QR code generation with qrcode library. ТРЕБУЕТСЯ: Backend testing всех referral endpoints."
+
+
 frontend:
   - task: "Contract ABIs Export"
     implemented: true
