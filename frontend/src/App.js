@@ -12,6 +12,7 @@ import Staking from "./pages/Staking";
 import StakingEnhanced from "./pages/StakingEnhanced";
 import PremiumPage from "./pages/PremiumPage";
 import NFTMarketplace from "./pages/NFTMarketplace";
+import ReferralDashboard from "./pages/ReferralDashboard";
 import DesignSystemShowcase from "./pages/DesignSystemShowcase";
 import TransactionModalExample from "./examples/TransactionModalExample";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
